@@ -31,7 +31,7 @@ if ($adminitem == 'blacklist') {print <<<EOT
 			<td class="td2"><div class="help_a">用英文","分隔</div></td>
 		</tr>
 		<tr class="tr1 vt">
-			<td class="td1">会员uid</td>
+			<td class="td1">UID</td>
 			<td class="td2"><textarea class="textarea" name="uidblacklist">$db_uidblacklist</textarea></td>
 			<td class="td2"><div class="help_a">用英文","分隔</div></td>
 		</tr>
@@ -142,6 +142,8 @@ EOT;
             <span class="bt2"><span><button type="button" onclick="window.location=('$basename&adminitem=pwcache&action=update&type=hotfavor');">更新缓存</button></span></span>
         </td>
     </tr>
+	
+	
       <tr class="tr1 vt">
       	<td class="td2">&nbsp;</td>
         <td class="td3">缓存库入库数目</td>

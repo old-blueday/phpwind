@@ -11,25 +11,27 @@ print <<<EOT
 -->
 <script type="text/javascript">
 	trclick = function(e,id,flag){
-		if(e.srcElement.tagName == 'DIV'){
+		var e=e||window.event;
+		var elem=e.target||e.srcElement;
+		if(elem.tagName == 'DIV'){
 			return false;
 		};
 		MC.showDetailMsg(id,flag);
 	}
 </script>
-<tr class="tr3" id="sms_0_{$value[id]}" $sms_0 oncopy="return true;" oncut="return true;" onclick="trclick(event,{$value[id]},1)">
+<tr class="tr3" id="sms_0_{$value[id]}" $sms_0 oncopy="return true;" oncut="return true;">
 	<td class="face">&nbsp;</td>
 	<td><a href="{$_linkUrl}">{$value[create_username]}</a></td>
 	<td><div class="lh_18 imgnone">{$value[content1]}</div></td>
+	<td><a href="javascript:" onclick="trclick(event,{$value[id]},1)" class="a_start">展开</a></td>
 </tr>
-<tr class="tr3 vt" id="sms_1_{$value[id]}" $sms_1
-	onclick="trclick(event,{$value[id]},2)">
+<tr class="tr3 vt" id="sms_1_{$value[id]}" $sms_1>
 	<td class="face" style="vertical-align:top;"><a class="img_50" href="{$_linkUrl}"><i><img width="48" height="48" src="{$value[face]}"></i></a></td>
 	<td class="name" style="vertical-align:top;width:120px;"><p>
 <!--
 EOT;
 if(checkOnline($value['thisvisit']) && $value[create_uid] != $winduid){
-$gender = $value['gender'] == 2 ? 'women' : 'man';
+$gender = getDefaultGender($value['gender']);
 print <<<EOT
 --><span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span>
 <!--
@@ -63,6 +65,7 @@ EOT;
 -->
 </em></td>
 <td><div class="textMes">{$value[content]}</div></td>
+<td style="vertical-align:top;"><a href="javascript:" onclick="trclick(event,{$value[id]},2)" class="a_shrink">收缩</a></td>
 </tr>
 <!--
 EOT;

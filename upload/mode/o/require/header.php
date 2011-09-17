@@ -29,6 +29,6 @@ $jobnum = ($winddb['jobnum']>0) ? "(".$winddb['jobnum'].")" : "";
 list($_Navbar,$_LoginInfo) = pwNavBar();
 $searchUrl = $basename.'q=friend&type=find&';
 
-require_once PrintEot('header');
+
 unset($_Navbar,$pwModeCss);
 ?>

@@ -38,7 +38,7 @@ print <<<EOT
 		</div>
 	</div>
 	<div class="f10 s6 tac">
-		<p class="mb5">Powered by <a href="http://www.phpwind.net/" target="_blank" class="s4">phpwind v{$wind_version}</a>&nbsp;<a href="http://www.phpwind.com/certificate.php?host={$pwServer['HTTP_HOST']}" target="_blank">Certificate</a> Copyright Time now is:$ft_time <br />&copy;2003-2011 <a href="$db_bbsurl/" target="_blank">{$GLOBALS['db_bbsname']}</a> 版权所有 $ft_gzip $db_icp $db_statscode <span id="stats"></span>
+		<p class="mb5">Powered by <a href="http://www.phpwind.net/" target="_blank" class="s4">phpwind v{$wind_version}</a>&nbsp;<a href="http://www.phpwind.com/certificate.php?host={$pwServer['HTTP_HOST']}" target="_blank">Certificate</a> Copyright Time now is:$ft_time <br />&copy;2003-2011 <a href="$db_bbsurl/" target="_blank">{$GLOBALS['db_bbsname']}</a> 版权所有 $ft_gzip $db_icp <span id="windspend">$wind_spend</span> $db_statscode <span id="stats"></span>
 <!--
 EOT;
 if($db_ystats_ifopen=='0'){print <<<EOT
@@ -50,7 +50,7 @@ if($db_ystats_ifopen=='0'){print <<<EOT
 <!--
 EOT;
 }print <<<EOT
---><span id="windspend">$wind_spend</span></p>
+--></p>
 	</div>
 </div>
 </div>
@@ -139,11 +139,11 @@ EOT;
 -->
 <!--
 EOT;
-if($GLOBALS[db_yunsearch_search] && $GLOBALS[db_yun_expand][guess_pop_setting] && in_array(SCR,explode("|",$GLOBALS[db_yun_expand][guess_pop_setting])) ){
-$guess_pop_bottom = ($GLOBALS[db_yun_expand] && $GLOBALS[db_yun_expand][guess_pop_bottom]) ? sprintf(html_entity_decode($GLOBALS[db_yun_expand][guess_pop_bottom]),$GLOBALS[fid],$GLOBALS[winduid],$GLOBALS[tid],$GLOBALS[subject]) : '';
+$cloudwind_footer = CloudWind::getSearchFooterTemplate(SCR,$GLOBALS [fid], $GLOBALS [winduid], $GLOBALS [tid], $GLOBALS [subject]);
+if($cloudwind_footer){
 print <<<EOT
 -->
-$guess_pop_bottom
+$cloudwind_footer
 <!--
 EOT;
 }print <<<EOT

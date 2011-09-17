@@ -418,8 +418,8 @@ class PW_Weibo {
 	}
 	
 	function deleteAttentionRelation($uid, $num) {
-		if ($num < 200) return 0;
-		$num = min($num - 200, 1000);
+		if ($num <= WEIBO_RELATION_NUM) return 0;
+		$num = min($num - WEIBO_RELATION_NUM, 1000);
 		$relationDao =  L::loadDB('weibo_relations','sns');
 		return $relationDao->deleteAttentionRelation($uid, $num);
 	}
@@ -1288,5 +1288,6 @@ class PW_Weibo {
 		$contentDao = L::loadDB('weibo_content','sns'); /* @var $contentDao PW_Weibo_ContentDB */
 		return $contentDao->findMidsByUids($uids);
 	}
+
 }
 ?>

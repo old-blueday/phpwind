@@ -77,7 +77,7 @@ if ($job == 'bakout') {
 	} elseif ($action == 'repair' || $action == 'optimize') {
 
 		!$_POST['tabledb'] && adminmsg('db_empty_tables');
-		$table = S::escapeChar(implode(', ',$_POST['tabledb']));
+		$table = S::escapeChar(implode(', ',array_unique($_POST['tabledb'])));
 
 		$db->dbpre = 'pw_';
 		if ($action == 'repair') {
@@ -234,15 +234,15 @@ if ($job == 'bakout') {
 			if(preg_match("/\.(sql|zip)$/i", $value)){
 				$deletePath = $bakupDir . $value;
 				if ($issub) {
-					preg_match('/^(pw_[^_]+_\d{12}_[a-z0-9]{5})_\d+\.(sql|zip)$/i', $value, $match);
+					preg_match('/^(pw_[^_]+_\d{14}_[a-z0-9]{5})_\d+\.(sql|zip)$/i', $value, $match);
 					$deletePath = $bakupDir . $match[1] . '/' . $value;
 				}
-				pwCache::deleteData($deletePath);
-			} elseif (preg_match('/^pw_([^_]+)_(\d{12})_[a-z0-9]{5}/i', $value)) {
+				P_unlink($deletePath);
+			} elseif (preg_match('/^pw_([^_]+)_(\d{14})_[a-z0-9]{5}/i', $value)) {
 				$fp = opendir($bakupDir . $value);
 				while (($file = readdir($fp)) !== false) {
 					if ($file == '.' || $file == '..') continue;
-					pwCache::deleteData($bakupDir . $value . '/' . $file);
+					P_unlink($bakupDir . $value . '/' . $file);
 				}
 				closedir($fp);
 				@rmdir($bakupDir . $value);
@@ -691,12 +691,13 @@ function updateMergeTmsgsTable() {
 			$threadTableNames[$key] = $key == 0 ? "{$PW}tmsgs" : "{$PW}tmsgs" . $key;
 		}
 	}
+	$engineType = $db->server_info() > '4.1' ? 'ENGINE=MERGE' : 'TYPE=MERGE';
 	$creatTable = $db->get_one("SHOW CREATE TABLE `pw_tmsgs`");
 	preg_match('/\(.+\)/is', $creatTable['Create Table'], $match);
 	preg_match('/CHARSET=([^;\s]+)/is', $creatTable['Create Table'], $charsetMatch);
 	$db->query("DROP TABLE IF EXISTS `pw_merge_tmsgs`");
 	ksort($threadTableNames);
-	$createTableSql = 'CREATE TABLE `pw_merge_tmsgs` ' . $match[0] . ' TYPE=MERGE UNION=(' . implode(',', $threadTableNames) . ') DEFAULT CHARSET=' . $charsetMatch[1] . ' INSERT_METHOD=LAST';
+	$createTableSql = 'CREATE TABLE `pw_merge_tmsgs` ' . $match[0] . " $engineType UNION=(" . implode(',', $threadTableNames) . ') DEFAULT CHARSET=' . $charsetMatch[1] . ' INSERT_METHOD=LAST';
 	$db->query($createTableSql);
 	
 	$success = $db->get_one("SHOW TABLE STATUS LIKE 'pw_merge_tmsgs'");
@@ -714,12 +715,13 @@ function updateMergePostsTable() {
 			$postTableNames[$key] = $key == 0 ? "{$PW}posts" : "{$PW}posts" . $key;
 		}
 	}
+	$engineType = $db->server_info() > '4.1' ? 'ENGINE=MERGE' : 'TYPE=MERGE';
 	$creatTable = $db->get_one("SHOW CREATE TABLE `pw_posts`");
 	preg_match('/\(.+\)/is', $creatTable['Create Table'], $match);
 	preg_match('/CHARSET=([^;\s]+)/is', $creatTable['Create Table'], $charsetMatch);
 	$db->query("DROP TABLE IF EXISTS `pw_merge_posts`");
 	ksort($postTableNames);
-	$createTableSql = 'CREATE TABLE `pw_merge_posts` ' . $match[0] . ' TYPE=MERGE UNION=(' . implode(',', $postTableNames) . ') DEFAULT CHARSET=' . $charsetMatch[1] . ' INSERT_METHOD=LAST';
+	$createTableSql = 'CREATE TABLE `pw_merge_posts` ' . $match[0] . " $engineType UNION=(" . implode(',', $postTableNames) . ') DEFAULT CHARSET=' . $charsetMatch[1] . ' INSERT_METHOD=LAST';
 	$db->query($createTableSql);
 	
 	$success = $db->get_one("SHOW TABLE STATUS LIKE 'pw_merge_posts'");

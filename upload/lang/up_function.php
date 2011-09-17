@@ -582,10 +582,11 @@ function createMergeTable($table) {
 
 	ksort($posts);
 	$createTableMatch = $charsetMatch = array();
+	$engineType = $db->server_info() > '4.1' ? 'ENGINE=MERGE' : 'TYPE=MERGE';
 	$creatTable = $db->get_one("SHOW CREATE TABLE `pw_$table`");
 	preg_match('/\(.+\)/is', $creatTable['Create Table'], $createTableMatch);
 	preg_match('/CHARSET=([^;\s]+)/is', $creatTable['Create Table'], $charsetMatch);
-	$createTableSql = "CREATE TABLE `$mergeTable` " . $createTableMatch[0] . ' TYPE=MERGE UNION=(' . implode(',', $posts) . ') DEFAULT CHARSET=' . $charsetMatch[1] . ' INSERT_METHOD=LAST';
+	$createTableSql = "CREATE TABLE `$mergeTable` " . $createTableMatch[0] . " $engineType UNION=(" . implode(',', $posts) . ') DEFAULT CHARSET=' . $charsetMatch[1] . ' INSERT_METHOD=LAST';
 	$db->query($createTableSql);
 
 	$success = $db->get_one("SHOW TABLE STATUS LIKE '$mergeTable'");

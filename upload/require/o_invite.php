@@ -4,7 +4,7 @@ require_once(R_P.'require/functions.php');
 PwNewDB();
 $friendServer = L::loadClass('Friend', 'friend');
 
-if ($hash == appkey($o_u,$app) && $winduid) {
+if ($hash == appkey($o_u,$app) && $winduid && ($o_u !== $winduid)) {
 	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 	$ckuser = $userService->get($o_u);
 	$iffriend = $friendServer->getFriendByUidAndFriendid($winduid,$o_u);

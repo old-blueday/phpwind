@@ -6,117 +6,123 @@ if($msg){print <<<EOT
 <!--
 EOT;
 }if($admintype=='appset'){
-print <<<EOT
--->
-<script type="text/javascript" src="{$db_server_url}/statics/common/js/global.js"></script>
-<script type="text/javascript">
-var server = new PwJs.Server("pwapp");
-server.start();
-</script>
-<!--
+
+	if ($adminitem == 'link'){
+	print <<<EOT
+	-->
+	<div class="nav3 mb10">
+		<ul class="cc" id="basictype">
+			<li><a href="$basename&admintype=appset" hidefocus="true">应用首页</a></li>
+			<li class="current"><a href="$basename&admintype=appset&adminitem=link" hidefocus="true">重新登录</a></li>
+		</ul>
+	</div>
+	
+	<h3 class="h1">关联帐号</h3>
+	
+	<form action="$basename&admintype=$admintype&adminitem=link" method="post">
+	<input type="hidden" name="step" value="2">
+	<div class="admin_table mb10">
+		<table width="100%" cellpadding="0" cellspacing="0">
+			<tr class="tr1">
+				<td class="td1">用户名 <span class="s1">*</span></td>
+				<td class="td2"><input type="text" class="input input_wa" name="username" /></td>
+			</tr>
+			<tr class="tr1">
+				<td class="td1">密码 <span class="s1">*</span></td>
+				<td class="td2"><input type="password" class="input input_wa" name="password" /></td>
+			</tr>
+		</table>
+	</div>
+	<div class="mb10 tac">
+		<span class="btn"><span><button type="submit">提 交</button></span></span>
+	</div>
+	</form>
+	<!--
 EOT;
-if(!$isRegister){
-print <<<EOT
--->
-<div class="nav3 mb10">
-	<ul class="cc" id="basictype">
-		<li class="current"><a hidefocus="true" href="$basename&admintype=appset">应用首页</a></li>
-	</ul>
-</div>
-
-<h3 class="h1">在线应用中心状态</h3>
-<div class="p10 mb15">
-	<p class="mb10">您好，您的在线应用中心还未注册，请先</p>
-      <p><span class="btn2"><span><button name="siteinfo" type="button" onclick="location.href='$basename&admintype=register';">注册</button></span></span><span class="bt2"><span><button name="login" type="button" onclick="location.href='$basename&admintype=link';">老帐号登录</button></span></span></p>
-</div>
-
-<iframe id="pwapp" name="pwapp" frameborder="0" width="100%" height="600" scrolling="no" src="{$onlineAppListUrl}"></iframe>
-
-<!--
+	} elseif ($adminitem == 'register'){ 
+	print <<<EOT
+	-->
+	<div class="nav3 mb10">
+		<ul class="cc" id="basictype">
+			<li><a href="$basename&admintype=appset&adminitem=link" hidefocus="true">应用首页</a></li>
+			<li class="current"><a href="$basename&admintype=appset&adminitem=register" hidefocus="true">在线注册</a></li>
+		</ul>
+	</div>
+	
+	<h3 class="h1">在线应用中心注册</h3>
+	
+	<form action="$basename&admintype=appset&adminitem=register" method="post">
+	<input type="hidden" name="step" value="2">
+	<div class="admin_table mb10">
+		<table width="100%" cellpadding="0" cellspacing="0">
+			<tr class="tr1">
+				<td class="td1">用户名 <span class="s1">*</span></td>
+				<td class="td2"><input type="text" class="input input_wa" name="username" /> <span class="gray">用于登录，注册后不可修改</span></td>
+			</tr>
+			<tr class="tr1">
+				<td class="td1">邮箱地址 <span class="s1">*</span></td>
+				<td class="td2"><input type="text" class="input input_wa" name="email" /> <span class="gray">请正确填写常用邮箱，注册后不可修改</span></td>
+			</tr>
+			<tr class="tr1">
+				<td class="td1">密码 <span class="s1">*</span></td>
+				<td class="td2"><input type="password" class="input input_wa" name="password" /></td>
+			</tr>
+			<tr class="tr1">
+				<td class="td1">确认密码 <span class="s1">*</span></td>
+				<td class="td2"><input type="password" class="input input_wa" name="repassword" /></td>
+			</tr>
+		</table>
+	</div>
+	<div class="mb10 tac">
+		<span class="btn"><span><button type="submit">提 交</button></span></span>
+	</div>
+	</form>
+	<!--
 EOT;
-}else{
-print <<<EOT
--->
-<iframe id="pwapp" name="pwapp" frameborder="0" width="100%" height="700" scrolling="no" src="{$loginUrl}"></iframe>
-<!--
+	}
+	else {
+		
+		print <<<EOT
+		-->
+		<script type="text/javascript" src="{$db_server_url}/statics/common/js/global.js"></script>
+		<script type="text/javascript">
+		var server = new PwJs.Server("pwapp");
+		server.start();
+		</script>
+		<!--
 EOT;
-}}elseif($admintype=='register'){
-print <<<EOT
--->
-<div class="nav3 mb10">
-	<ul class="cc" id="basictype">
-		<li><a href="$basename&admintype=appset" hidefocus="true">应用首页</a></li>
-		<li class="current"><a href="$basename&admintype=register" hidefocus="true">在线注册</a></li>
-	</ul>
-</div>
-
-<h3 class="h1">在线应用中心注册</h3>
-
-<form action="$basename&admintype=$admintype" method="post">
-<input type="hidden" name="step" value="2">
-<div class="admin_table mb10">
-	<table width="100%" cellpadding="0" cellspacing="0">
-		<tr class="tr1">
-			<td class="td1">用户名 <span class="s1">*</span></td>
-			<td class="td2"><input type="text" class="input input_wa" name="username" /> <span class="gray">用于登录，注册后不可修改</span></td>
-		</tr>
-		<tr class="tr1">
-			<td class="td1">邮箱地址 <span class="s1">*</span></td>
-			<td class="td2"><input type="text" class="input input_wa" name="email" /> <span class="gray">请正确填写常用邮箱，注册后不可修改</span></td>
-		</tr>
-		<tr class="tr1">
-			<td class="td1">密码 <span class="s1">*</span></td>
-			<td class="td2"><input type="password" class="input input_wa" name="password" /></td>
-		</tr>
-		<tr class="tr1">
-			<td class="td1">确认密码 <span class="s1">*</span></td>
-			<td class="td2"><input type="password" class="input input_wa" name="repassword" /></td>
-		</tr>
-	</table>
-</div>
-<div class="mb10 tac">
-	<span class="btn"><span><button type="submit">提 交</button></span></span>
-</div>
-</form>
-<!--
+		if(!$isRegister){
+		print <<<EOT
+		-->
+		<div class="nav3 mb10">
+			<ul class="cc" id="basictype">
+				<li class="current"><a hidefocus="true" href="$basename&admintype=appset">应用首页</a></li>
+			</ul>
+		</div>
+		
+		<h3 class="h1">在线应用中心状态</h3>
+		<div class="p10 mb15">
+			<p class="mb10">您好，您的在线应用中心还未注册，请先</p>
+		      <p><span class="btn2"><span><button name="siteinfo" type="button" onclick="location.href='$basename&admintype=appset&adminitem=register';">注册</button></span></span><span class="bt2"><span><button name="login" type="button" onclick="location.href='$basename&admintype=appset&adminitem=link';">老帐号登录</button></span></span></p>
+		</div>
+		
+		<iframe id="pwapp" name="pwapp" frameborder="0" width="100%" height="600" scrolling="no" src="{$onlineAppListUrl}"></iframe>
+		
+		<!--
 EOT;
-}elseif($admintype=='link'){
-print <<<EOT
--->
-<div class="nav3 mb10">
-	<ul class="cc" id="basictype">
-		<li><a href="$basename&admintype=appset" hidefocus="true">应用首页</a></li>
-		<li class="current"><a href="$basename&admintype=link" hidefocus="true">重新登录</a></li>
-	</ul>
-</div>
-
-<h3 class="h1">关联帐号</h3>
-
-<form action="$basename&admintype=$admintype" method="post">
-<input type="hidden" name="step" value="2">
-<div class="admin_table mb10">
-	<table width="100%" cellpadding="0" cellspacing="0">
-		<tr class="tr1">
-			<td class="td1">用户名 <span class="s1">*</span></td>
-			<td class="td2"><input type="text" class="input input_wa" name="username" /></td>
-		</tr>
-		<tr class="tr1">
-			<td class="td1">密码 <span class="s1">*</span></td>
-			<td class="td2"><input type="password" class="input input_wa" name="password" /></td>
-		</tr>
-	</table>
-</div>
-<div class="mb10 tac">
-	<span class="btn"><span><button type="submit">提 交</button></span></span>
-</div>
-</form>
-<!--
+		}else{
+		print <<<EOT
+		-->
+		<iframe id="pwapp" name="pwapp" frameborder="0" width="100%" height="700" scrolling="no" src="{$loginUrl}"></iframe>
+		<!--
 EOT;
+		}
+	}
 }elseif($admintype=='onlineapp'){
 if (empty($db_appifopen)) {print <<<EOT
 -->
-<form action="{$basename}" method="post">
-<input type="hidden" name="admintype" value="open" />
+<form action="{$basename}&admintype=onlineapp" method="post">
+<input type="hidden" name="adminitem" value="open" />
 <div class="admin_info mb10">
 	<h2 class="h1">会员应用</h2>
     <div class="legend">
@@ -141,13 +147,13 @@ EOT;
     </div>
 </div>
 <div class="mb10">
-    <form action="{$basename}" method="post">
-    <input type="hidden" name="admintype" value="open" />
+    <form action="{$basename}&admintype=onlineapp" method="post">
+    <input type="hidden" name="adminitem" value="open" />
 	<input type="hidden" name="updatelist" value="1" />
     <span class="bt2"><span><button type="submit" onfocus="blur();">数据更新</button></span></span>
     </form>
-    <form id="close" action="{$basename}" method="post">
-    <input type="hidden" name="admintype" value="close" />
+    <form id="close" action="{$basename}&admintype=onlineapp" method="post">
+    <input type="hidden" name="adminitem" value="close" />
     <span class="bt2"><span><button type="button" onClick="appcheck();">关闭应用</button></span></span>
     </form>
 <script type="text/javascript">

@@ -1,3 +1,4 @@
+var extracheck	= [];
 function Element(evtobj,info,infobox,relObj,required){
     this.o = evtobj;
     this.m = info;
@@ -31,11 +32,11 @@ var regGdTimer;
     	textareaElement[j].onfocus 	= onFocus;
     	textareaElement[j].onblur 	= onBlur;
     }
-    setTimeout(function(){
+    onReady(function(){
     	for(var z=0;z<extracheck.length;z++){
     		extracheck[z].onclick = changeArea;
     	}
-    },100);
+    });
 })();
 
 /*fix lh*/
@@ -104,8 +105,7 @@ function clickRadio(event) {
 var ajaxCheckArray = new Array();
 function checkAll(e){
 	var e = window.event || e;
-	if(e.preventDefault){e.preventDefault();}
-	e.returnValue = false;
+	if(e.preventDefault){e.preventDefault();}else{e.returnValue = false;}
     var result = 1;
     //校验input
     var e =  document.getElementsByTagName("input");

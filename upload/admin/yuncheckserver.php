@@ -1,11 +1,6 @@
 <?php
-/**
- * 平台检测后台管理
- * @author L.IuHu.I@2011 developer.liuhui@gmail.com
- */
-require_once R_P . 'lib/cloudwind/yunextendfactory.class.php';
-$factory = new PW_YunExtendFactory ();
-$_service = $factory->getYunCheckServerService ();
+require_once(R_P.'lib/cloudwind/cloudwind.class.php');
+$_service = CloudWind::getPlatformCheckServerService ();
 if ($_service->checkCloudWind () < 9) {
 	ObHeader ( $admin_file . '?adminjob=yunbasic' );
 }

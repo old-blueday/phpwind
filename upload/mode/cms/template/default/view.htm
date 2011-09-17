@@ -144,7 +144,7 @@ EOT;
 }if (checkReplyPurview()) {
 print <<<EOT
 -->					
-			<form method="post" id="mainForm" name="FORM" onsubmit="return addcmscomment(document.FORM)" action="pw_ajax.php?action=cmsreply&type=addcomment" >
+			<form method="post" id="mainForm" name="FORM" onsubmit="addcmscomment(document.FORM)" action="pw_ajax.php?action=cmsreply&type=addcomment" >
 			<input type="hidden" name="article_id" value="{$id}">
 			<div class="mb10">
 <!--
@@ -154,14 +154,21 @@ print <<<EOT
 -->
 			</div>
 			<div class="mb20">
-				<span class="btn" style="margin:0;"><span><button id="cmsSubmit" disabled="disabled" type="submit" >评论</button></span></span>
+				<span class="btn" style="margin:0;"><span><button id="cmsSubmit" type="submit" >评论</button></span></span>
 			</div>	
 			</form>
 <script type="text/javascript">
 onReady(function(){
+	//fix firefox
 	getObj("cmsSubmit").disabled=false;
 })
 function addcmscomment(form){
+	var e=getEvent();
+	if(e.preventDefault){
+		e.preventDefault();	
+	}else{
+		e.returnValue=false;	
+	}
 	getObj("cmsSubmit").disabled=true;
 	var atc_content = editor.getUBB();
 	if(atc_content.replace(/\s*/g,'') == ''){
@@ -440,6 +447,15 @@ function imgLoad(){
 		}
 	}
 }
+window.onReady(function(){
+	//控制多媒体播放
+	var videos=getElementsByClassName("video");
+	for(var i=0,len=videos.length;i<len;i++){
+(function(elem){
+toggleVideo(elem);
+})(videos[i])
+	}
+});
 </script>
 <!--
 EOT;

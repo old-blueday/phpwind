@@ -261,7 +261,7 @@ if ($type == 'attention') {
 			$onlineUserkeys = array_keys($onlineUsers);
 			$onlineUserkeys = randArray($onlineUserkeys, 6);
 			$onlineUids = $onlineUserkeys;
-			$query = $db->query("SELECT m.uid,m.username,m.email,m.icon as face,m.regdate,m.honor,m.gender as sex,m.groupid,m.memberid,md.thisvisit,md.fans" . " FROM pw_members m " . " LEFT JOIN pw_memberdata md ON m.uid = md.uid" . " WHERE m.uid IN(" . S::sqlImplode($onlineUserkeys) . ")" . " AND m.uid !=" . S::sqlEscape($winduid));
+			$query = $db->query("SELECT m.uid,m.username,m.email,m.icon as face,m.regdate,m.honor,m.gender,m.groupid,m.memberid,md.thisvisit,md.fans" . " FROM pw_members m " . " LEFT JOIN pw_memberdata md ON m.uid = md.uid" . " WHERE m.uid IN(" . S::sqlImplode($onlineUserkeys) . ")" . " AND m.uid !=" . S::sqlEscape($winduid));
 			while ($rt = $db->fetch_array($query)) {
 				list($rt['face']) = showfacedesign($rt['face'], '1', 'm');
 				$rt['regdate'] = get_date($rt['regdate']);

@@ -16,12 +16,10 @@ print <<<EOT
 			<div class="p10">
 				<div class="f16 mb10" style=" font-family:Microsoft YaHei;"><img src="u/images/icon/tags.png" align="absmiddle" class="mr5" />添加描述自己<span class="blue">职业</span>、<span class="s2">兴趣爱好</span>等方面的词语，让更多人找到你，让你找到更多同类</div>
 				<div class="tagBox">
-					<form id="addtag" name="addtag" action="profile.php?action=modify&info_type=tags" method="post">
 					<input type="hidden" id="tagsUid" value="$winduid" />
 						<div class="tagAdd fl">
-							<input type="text" name="tagname" id="tagname" class="input gray" style="width:200px;" value="添加标签，寻找好友" onFocus="addFocus(this)" onBlur="addBlur(this)" /><span class="bt2"><span><button type="button" onclick="addTag();"> &nbsp;添加标签&nbsp; </button></span></span>
+							<input type="text" name="tagname" id="tagname" class="input gray" style="width:200px;" value="添加标签，寻找好友" onFocus="addFocus(this)" onKeyUp="keyUpTag(event,this);" onBlur="addBlur(this)" /><span class="bt2"><span><button type="button" onclick="addTag();"> &nbsp;添加标签&nbsp; </button></span></span>
 						</div>
-					</form>
 <!--
 EOT;
 if ($hotTags) { print <<<EOT
@@ -55,7 +53,7 @@ EOT;
 }print <<<EOT
 -->
 				</div>
-				<h2 class="tagHd f14 s5 mb10">已选择的标签：</h2>
+				<h2 class="tagHd f14 s5 mb10">已添加的标签：</h2>
 					<ul class="cc tagList" id="createtags">
 <!--
 EOT;

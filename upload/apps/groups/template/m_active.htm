@@ -734,8 +734,9 @@ white-space:nowrap;
 <!--
 EOT;
 //max attachnum
-if ($_G['allownum'] > 0 && $_G['allownum'] - $winddb['uploadnum']<$db_attachnum){
-	$maxAttachnum = $_G['allownum'] - $winddb['uploadnum'];
+$uploadedNum = $winddb['uploadtime'] < $tdtime ? 0 : $winddb['uploadnum'];
+if ($_G['allownum'] > 0 && $_G['allownum'] - $uploadedNum<$db_attachnum){
+	$maxAttachnum = $_G['allownum'] - $uploadedNum;
 } else {
 	$maxAttachnum = $db_attachnum;
 }

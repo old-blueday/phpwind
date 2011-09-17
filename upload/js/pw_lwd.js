@@ -123,14 +123,14 @@ function copyUrl(o) {
 		prompt('按下 Ctrl+C 复制到剪贴板', copyurl+o)
 	}
 }
-function postreply(txt) {//回复弹出编辑器
+function postreply(txt,posturl) {//回复弹出编辑器
 	clearEditorDialog();
 	read.guide();
 	var url="";
 	if(typeof pw_baseurl!="undefined"){
 		url=pw_baseurl+"/";
 	}
-	setTimeout(function(){ajax.send(url+'pw_ajax.php?action=quickpost&tid=' + tid + '&fid=' + fid,'',function(){
+	setTimeout(function(){ajax.send(url+posturl,'',function(){
 
 		if (ajax.request.responseText != null && ajax.request.responseText.indexOf('popTop') != -1) {
 			read.setMenu(this.runscript(ajax.request.responseText), '');
@@ -186,8 +186,11 @@ function postreply(txt) {//回复弹出编辑器
 	});},100);
 	return false;
 }
-function clearEditorDialog(){
-	closep();
+function clearEditorDialog(all){
+	if(all){
+		//关闭read.menu
+		closep();
+	}
 	var elems=getElementsByClassName("B_menu");
 	for(var i=0,len=elems.length;i<len;i++){
 		elems[i].style.display="none";
@@ -231,7 +234,8 @@ function fontsize(text,id){
 if (typeof totalpage != 'undefined' && totalpage > 1) {
 	document.onkeydown = function(e) {
 		var e = window.event || e;
-		var tagname = e.srcElement.tagName || e.target.tagName;
+		var tag=e.target||e.srcElement;
+		var tagname = tag.tagName || tag.tagName;
 		if (tagname == 'INPUT' || tagname == 'TEXTAREA') {
 			return;
 		}
@@ -311,7 +315,7 @@ function checkUrl(obj) {
 		}
 	}
 
-	var regex2 = /^http(s)?:\/\/(\w+\.)*((\w+)\.(com|net|cn|com\.cn|net\.cn|org|org\.cn|biz|cc|name|asia|mobi|me|tel|中国|公司|网络|hk|tv))(\/(.+))?/;
+	var regex2 = /^http(s)?:\/\/([a-z0-9\-]+\.)*(([a-z0-9\-]+)\.(com|net|cn|com\.cn|net\.cn|org|org\.cn|biz|cc|name|asia|mobi|me|tel|中国|公司|网络|hk|tv))(\/(.+))?/;
 	var r2 = regex2.exec(db_bbsurl);
 
 	if (r2 != null && url.indexOf(r2[3]) != -1) {

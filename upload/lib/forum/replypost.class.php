@@ -144,7 +144,8 @@ class replyPost {
 			'ifcheck' => $this->data['ifcheck'],
 			'content' => $this->data['content'],
 			'anonymous' => $this->data['anonymous'],
-			'ifhide' => $this->data['hideatt']
+			'ifhide' => $this->data['hideatt'],
+			'frommob' => $this->data['frommob']
 		);
 		$pw_posts = GetPtable($this->tpcArr['ptable']);
 		if ($db_plist && count($db_plist) > 1) {

@@ -184,7 +184,7 @@ if (empty($action)) {
 		$pages = numofpage($count,$page,ceil($count/$db_perpage), "$basename&action=$action&keyword=".rawurlencode($keyword).'&');
 		$query = $db->query("SELECT * FROM pw_searchadvert WHERE 1 $sql ORDER BY id DESC $limit");
 		while ($rt = $db->fetch_array($query)) {
-			$rt['keyword'] = str_replace($keyword,'<font color="red"><u>'.$keyword.'</u></font>',$rt['keyword']);
+			$rt['keyword'] = str_replace($keyword,'<em class="s1">'.$keyword.'</em>',$rt['keyword']);
 			$rt['endtime'] = get_date($rt['endtime'],'Y-m-d');
 			$adverts[$rt['id']] = $rt;
 		}

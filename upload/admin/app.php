@@ -22,164 +22,164 @@ if ($db_siteappkey) $msg = $appclient->getUrlChangedMsg();/*判断url地址是�
 
 if ($admintype == 'appset') {
 
-	/*sitehash check*/
-	$updatecache = false;
-	$query = $db->query("SELECT db_name,db_value FROM pw_config WHERE db_name='db_siteid' OR db_name='db_siteownerid' OR db_name='db_sitehash'");
-	while ($rt = $db->fetch_array($query)) {
-		if (($rt['db_name'] == 'db_siteid' && $rt['db_value'] != $db_siteid) || ($rt['db_name'] == 'db_siteownerid' && $rt['db_value'] != $db_siteownerid) || ($rt['db_name'] == 'db_sitehash' && $rt['db_value'] != $db_sitehash)) {
-			${$rt['db_name']} = preg_replace('/[^\d\w\_]/is','',$rt['db_value']);
+	if($adminitem == 'link') {
+		S::gp(array('step'), 'P', 2);
+		if ($step == 2) {
+			S::gp(array('username','password'), 'P');
+			
+			$siteappkey = $appclient->linkWebmaster(
+				array(
+					'username' => $username,
+					'password' => $password,
+				)
+			);
+			
+			if (empty($siteappkey['status'])) {
+				
+				$jumpUrl = 'javascript:history.go(-1);';
+	
+				$msg = $appclient->getErrorLinkCodeMsg($siteappkey['code']);
+	
+				adminmsg($msg,$jumpUrl);
+			}
+			
+			setConfig('db_siteappkey', $siteappkey['siteid']);
+			updatecache_c();
+	
+			adminmsg('operate_success',"$basename&admintype=appset");
+		}
+	} elseif ($adminitem == 'register') {/*注册站长中心*/
+
+		S::gp(array('step'), 'P', 2);
+	
+		if ($step == 2) {
+			S::gp(array('username','email','password','repassword'), 'P');
+			
+			$siteappkey = $appclient->registerWebmaster(
+				array(
+					'username' => $username,
+					'email' => $email,
+					'password' => $password,
+					'repassword' => $repassword,
+				)
+			);
+	
+			if (empty($siteappkey['status'])) {
+				
+				$jumpUrl = 'javascript:history.go(-1);';
+	
+				$msg = $appclient->getErrorRegCodeMsg($siteappkey['code']);
+	
+				adminmsg($msg,$jumpUrl);
+			}
+			
+			setConfig('db_siteappkey', $siteappkey['siteid']);
+			updatecache_c();
+	
+			adminmsg('operate_success',"$basename&admintype=appset");
+		}
+	
+		$isLogin = $appclient->loginWebmaster();
+		
+		$isLogin == 1 && adminmsg('已有在线应用中心帐号，请勿重复注册',"$basename&admintype=appset");
+	
+		if ($db_siteappkey && $isLogin != 1) {/*如果站长中心未注册，则更新论坛缓存*/
+			setConfig('db_siteappkey', '');
+			updatecache_c();
+		}
+	
+	//} elseif ($admintype == 'link') {/*关联帐号*/
+	
+	} else {
+		
+		/*sitehash check*/
+		$updatecache = false;
+		$query = $db->query("SELECT db_name,db_value FROM pw_config WHERE db_name='db_siteid' OR db_name='db_siteownerid' OR db_name='db_sitehash'");
+		while ($rt = $db->fetch_array($query)) {
+			if (($rt['db_name'] == 'db_siteid' && $rt['db_value'] != $db_siteid) || ($rt['db_name'] == 'db_siteownerid' && $rt['db_value'] != $db_siteownerid) || ($rt['db_name'] == 'db_sitehash' && $rt['db_value'] != $db_sitehash)) {
+				${$rt['db_name']} = preg_replace('/[^\d\w\_]/is','',$rt['db_value']);
+				$updatecache = true;
+			}
+		}
+		$db->free_result($query);
+	
+		if (!$db_siteid) {
+			$db_siteid = generatestr(32);
+			setConfig('db_siteid', $db_siteid);
+	
+			$db_siteownerid = generatestr(32);
+			setConfig('db_siteownerid', $db_siteownerid);
+	
+			$db_sitehash = '10'.SitStrCode(md5($db_siteid.$db_siteownerid),md5($db_siteownerid.$db_siteid));
+			setConfig('db_sitehash', $db_sitehash);
 			$updatecache = true;
 		}
-	}
-	$db->free_result($query);
-
-	if (!$db_siteid) {
-		$db_siteid = generatestr(32);
-		setConfig('db_siteid', $db_siteid);
-
-		$db_siteownerid = generatestr(32);
-		setConfig('db_siteownerid', $db_siteownerid);
-
-		$db_sitehash = '10'.SitStrCode(md5($db_siteid.$db_siteownerid),md5($db_siteownerid.$db_siteid));
-		setConfig('db_sitehash', $db_sitehash);
-		$updatecache = true;
-	}
-
-	if ($app_version || $updatecache) {
-		updatecache_c();
-	}
-	/*sitehash check*/
-
-	/*站长中心*/
-	$isRegister = false;
 	
-	$isLogin = $appclient->loginWebmaster();
-
-	if ($isLogin != 1) $checkResult = $appclient->checkUsername($db_appid);
-
-	if ($checkResult == 1 || $isLogin == 1) {/*线上判断是否注册*/
-
-		if ($checkResult == 1) pwCache::getData(D_P.'data/bbscache/config.php');
-
-		$isRegister = true;
-		$loginUrl = $appclient->getLoginWebmasterUrl($db_siteappkey);
-	}
-
-	$isRegister == false && $onlineAppListUrl = $appclient->getOnlineAppList();
-	/*站长中心*/
-
-} elseif ($admintype == 'register') {/*注册站长中心*/
-
-	S::gp(array('step'), 'P', 2);
-
-	if ($step == 2) {
-		S::gp(array('username','email','password','repassword'), 'P');
-		
-		$siteappkey = $appclient->registerWebmaster(
-			array(
-				'username' => $username,
-				'email' => $email,
-				'password' => $password,
-				'repassword' => $repassword,
-			)
-		);
-
-		if (empty($siteappkey['status'])) {
-			
-			$jumpUrl = 'javascript:history.go(-1);';
-
-			$msg = $appclient->getErrorRegCodeMsg($siteappkey['code']);
-
-			adminmsg($msg,$jumpUrl);
+		if ($app_version || $updatecache) {
+			updatecache_c();
 		}
-		
-		setConfig('db_siteappkey', $siteappkey['siteid']);
-		updatecache_c();
-
-		adminmsg('operate_success',"$basename&admintype=appset");
-	}
-
-	$isLogin = $appclient->loginWebmaster();
+		/*sitehash check*/
 	
-	$isLogin == 1 && adminmsg('已有在线应用中心帐号，请勿重复注册',"$basename&admintype=appset");
-
-	if ($db_siteappkey && $isLogin != 1) {/*如果站长中心未注册，则更新论坛缓存*/
-		setConfig('db_siteappkey', '');
-		updatecache_c();
-	}
-
-} elseif ($admintype == 'link') {/*关联帐号*/
-
-	S::gp(array('step'), 'P', 2);
-
-	if ($step == 2) {
-		S::gp(array('username','password'), 'P');
+		/*站长中心*/
+		$isRegister = false;
 		
-		$siteappkey = $appclient->linkWebmaster(
-			array(
-				'username' => $username,
-				'password' => $password,
-			)
-		);
-		
-		if (empty($siteappkey['status'])) {
-			
-			$jumpUrl = 'javascript:history.go(-1);';
-
-			$msg = $appclient->getErrorLinkCodeMsg($siteappkey['code']);
-
-			adminmsg($msg,$jumpUrl);
+		$isLogin = $appclient->loginWebmaster();
+	
+		if ($isLogin != 1) $checkResult = $appclient->checkUsername($db_appid);
+	
+		if ($checkResult == 1 || $isLogin == 1) {/*线上判断是否注册*/
+	
+			if ($checkResult == 1) pwCache::getData(D_P.'data/bbscache/config.php');
+	
+			$isRegister = true;
+			$loginUrl = $appclient->getLoginWebmasterUrl($db_siteappkey);
 		}
-		
-		setConfig('db_siteappkey', $siteappkey['siteid']);
-		updatecache_c();
-
-		adminmsg('operate_success',"$basename&admintype=appset");
+	
+		$isRegister == false && $onlineAppListUrl = $appclient->getOnlineAppList();
+		/*站长中心*/
+			
 	}
 
 } elseif ($admintype == 'onlineapp') {/*会员应用*/
-
+	if ($adminitem == 'open') {
+		S::gp(array('open_app','updatelist'));
+	
+		$str = $appclient->alertAppState('open');
+	
+		$app_set = $db_server_url.'/appset.php';
+		if ($response = PostHost($app_set, $str, 'POST')) {
+			$response = unserialize($response);
+		} else {
+			$response = array('result' => 'error', 'error' => 3);
+		}
+	
+		if (empty($response['error']) && $updatelist != 1) {
+	
+			setConfig('db_appifopen', 1);
+			updatecache_c();
+		}
+	
+		adminmsg($response['result'],"$basename&admintype=onlineapp");
+	}
+	elseif ($adminitem == 'close') {
+		$str = $appclient->alertAppState('close');
+	
+		$app_set = $db_server_url.'/appset.php';
+		if ($response = PostHost($app_set, $str, 'POST')) {
+			$response = unserialize($response);
+		} else {
+			$response = array('result' => 'error', 'error' => 3);
+		}
+		if (empty($response['error'])) {
+			setConfig('db_appifopen', 0);
+			updatecache_c();
+		}
+	
+		adminmsg($response['result'],"$basename&admintype=onlineapp");
+	}
 	$appurl = $appclient->getOnlineApp();
 
-} elseif ($admintype == 'open') {/*会员应用打开*/
-
-	S::gp(array('open_app','updatelist'));
-
-	$str = $appclient->alertAppState('open');
-
-	$app_set = $db_server_url.'/appset.php';
-	if ($response = PostHost($app_set, $str, 'POST')) {
-		$response = unserialize($response);
-	} else {
-		$response = array('result' => 'error', 'error' => 3);
-	}
-
-	if (empty($response['error']) && $updatelist != 1) {
-
-		setConfig('db_appifopen', 1);
-		updatecache_c();
-	}
-
-	adminmsg($response['result'],"$basename&admintype=onlineapp");
-
-} elseif ($admintype == 'close') {/*会员应用关闭*/
-
-	$str = $appclient->alertAppState('close');
-
-	$app_set = $db_server_url.'/appset.php';
-	if ($response = PostHost($app_set, $str, 'POST')) {
-		$response = unserialize($response);
-	} else {
-		$response = array('result' => 'error', 'error' => 3);
-	}
-	if (empty($response['error'])) {
-		setConfig('db_appifopen', 0);
-		updatecache_c();
-	}
-
-	adminmsg($response['result'],"$basename&admintype=onlineapp");
-
-} elseif ($admintype == 'blooming') {/*帖子交换*/
+}  elseif ($admintype == 'blooming') {/*帖子交换*/
 
 	$appurl = $appclient->getThreadsUrl('admin', 'blooming', 'index');
 

@@ -17,7 +17,7 @@ $lang['wap'] = array (
 'reply_group'		=> '您所属的用户组没有发表回复的权限',
 'wap_login'			=> '登录成功!',
 'login_have'		=> '您已经为会员身份,请不要重复登录!',
-'post_openpost'		=> '由于工作力度与时间原因, 站点开放评论时间为 {$GLOBALS[db_poststart]}:{$GLOBALS[db_poststartminute]} 到 {$GLOBALS[db_postend]}:{$GLOBALS[db_postendminute]} !',
+'post_openpost'		=> '由于工作力度与时间原因, 站点开放评论时间为 {$GLOBALS[db_poststart]}:00 点到 {$GLOBALS[db_postend]}:00 点 !',
 'post_check'		=> '您还没通过管理员验证,需要通过管理员验证才能发言！',
 'post_newrg_limit'	=> '新注册用户{$GLOBALS[db_postallowtime]}分钟内不能发帖！',
 'post_gp_limit'		=> '用户组权限：你所属的用户组每日最多能发 {$GLOBALS[_G][postlimit]} 篇帖子.',
@@ -26,7 +26,7 @@ $lang['wap'] = array (
 'reply_ifcheck'		=> '该帖未通过管理员验证，不可回复',
 'reply_lockatc'		=> '该帖已被锁定，不可回复',
 'read_locked'		=> '此帖被管理员关闭，暂时不能浏览',
-'login_jihuo'		=> '你的帐号没有激活，请先到您注册的电子邮箱里激活帐号!',
+'login_jihuo'		=> '你的帐号没有激活，请先到您注册的邮箱里激活帐号!',
 'login_pwd_error'	=> '密码错误,您还可以尝试 $GLOBALS[L_T] 次',
 'login_forbid'		=> '已经连续 6 次密码输入错误,您将在 10 分钟内无法正常登录,还剩余 $GLOBALS[L_T] 秒',
 'user_not_exists'	=> '用户{$GLOBALS[errorname]}不存在',
@@ -47,5 +47,13 @@ $lang['wap'] = array (
 
 'recommend_close'	=> '推荐功能未开启',
 'pro_loadimg_limit_wap'		=> '上传附件超过指定大小$GLOBALS[filesize]KB',
+'enter_thread'			=> '<a href=thread.php?fid={$GLOBALS[fid]}>[ 发帖完毕点击进入主题列表 ]</a>',
+'enter_words'			=> '你发布的内容包含敏感词“{$GLOBALS[banword]}”，相关内容被替换，请及时更新',
+'post_word_check'			=> '你发布的内容包含敏感词“{$GLOBALS[banword]}”，请等待管理员审核!',
+'post_check'				=> '文章发表成功,本版块开启了发帖审核功能,请等待管理员审核!',
+'post_wordsfb'				=> '警告：您提交的内容中含有非法词语 \'<font color=red>$GLOBALS[banword]</font>\'！',
+'title_wordsfb'				=> '警告：标题中含有非法词语 \'<font color=red>{$GLOBALS[banword]}</font>\'！',
+'content_wordsfb'			=> '警告：内容中含有非法词语 \'<font color=red>{$GLOBALS[banword]}</font>\'！',
+
 );
 ?>

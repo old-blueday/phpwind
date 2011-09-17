@@ -152,7 +152,7 @@ if ($tid) {
 		$sql = $forceindex = '';
 		if ($fid) {
 			$sql = "WHERE t.fid=" . pwEscape($fid) . " AND ifcheck=1 AND t.ifshield=0
-						  AND topped='0' AND postdate>" . pwEscape($timestamp - 604800) . " 
+						  AND specialsort='0' AND postdate>" . pwEscape($timestamp - 604800) . " 
 					ORDER BY postdate DESC LIMIT $Rss_listnum";
 		} else {
 			$fids  = $extra = '';
@@ -164,7 +164,7 @@ if ($tid) {
 				$extra = ',';
 			}
 			if ($fids) {
-				$sql = "WHERE t.fid IN($fids) AND ifcheck=1 AND topped='0' AND ifshield=0 AND postdate>" . pwEscape($timestamp - 604800) . " 
+				$sql = "WHERE t.fid IN($fids) AND ifcheck=1 AND specialsort='0' AND ifshield=0 AND postdate>" . pwEscape($timestamp - 604800) . " 
 						ORDER BY postdate DESC 
 						LIMIT $Rss_newnum";
 				$forceindex = '';

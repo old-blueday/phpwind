@@ -33,8 +33,7 @@ if (empty($action)) {
 	while ($rt = $db->fetch_array($systemQuery)) {
 		$systemGroup[] = $rt['gid'];
 	}
-
-	$sql = $teamUid ? ' AND uid IN (' .S::sqlImplode($teamUid).')' : '';
+	$sql = $teamUid ? ' AND m.uid IN (' .S::sqlImplode($teamUid).')' : '';
 	$admindb = array();
 	$query = $db->query("SELECT m.uid,m.username,m.groupid,m.groups,m.regdate,md.lastvisit,md.lastpost FROM pw_members m LEFT JOIN pw_memberdata md USING(uid) WHERE 1 $sql ORDER BY uid");
 	if(!$query) adminmsg('读取数据出错');

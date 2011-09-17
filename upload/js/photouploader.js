@@ -31,10 +31,10 @@ var uploader = {
 		{
 			var tr = qlist.insertRow(0);
 			var cel1 = tr.insertCell(0);
-			cel1.className='wname';
 			cel1.innerHTML = queue[i].name;
 			
 			var cel2 = tr.insertCell(1);
+			cel2.className='wname';
 			var desc = queue[i].desc===undefined?queue[i].name:queue[i].desc;
 			cel2.innerHTML = '<input type="text" value="'+desc+'" onchange="uploader.storage(this)" />';			
 			var cel3 = tr.insertCell(2);

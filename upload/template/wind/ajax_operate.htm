@@ -5,10 +5,6 @@ print <<<EOT
 	function cutStrContent(){
 		var content = document.getElementById('atc_content');
 		if(strlen(content.value) > 100 ) content.value = substr(content.value,100);
-		var ad =  document.getElementById('atc_content_warn');
-		if(strlen(content.value) ==100){
-			ad.innerHTML = "剩余0字节";
-		}
 	}
 </script>
 <!-- 
@@ -20,6 +16,7 @@ print <<<EOT
 <input type="hidden" name="verify" value="$verifyhash" />
 <input type="hidden" name="page" value="$page" />
 <input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="step" value=1 />
 <!--
 EOT;
 $count = 0;
@@ -33,78 +30,96 @@ EOT;
 }
 print <<<EOT
 -->
-<div style="width:450px;">
-<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>帖子评分</div>
-<table width="100%" class="vt z mb5">
-	<tr class="tr3">
-		<td width="80">操作类型:</td>
+<div style="width:400px;">
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>帖子评分&nbsp;<span class="fn f12">(<em class="s1">$count</em> 篇)</span></div>
+<div class="read_score_pop">
+<table width="100%">
+<!--
+EOT;
+foreach($creditselect as $key => $v){
+if(isset($noneJsonList[$key])){
+print <<<EOT
+-->  
+	<tr>
+		<th><span class="w">{$v}：</span></th>
+		<td width="80">
+<!--
+EOT;
+if($noneJsonList[$key]['max']){
+print <<<EOT
+--> 
+			<div class="rating_pop cc w">
+<!--
+EOT;
+foreach($noneJsonList[$key]['max'] as $rate){
+if($rate <= $raterange[$key]['mrpd']){print <<<EOT
+-->  
+           		<a href="javascript:;" hidefocus="false" onclick="readByRateOpen(this,'addpoint$key','$key','remain$key');">{$rate}</a>
+<!--
+EOT;
+}else{print <<<EOT
+-->  
+               <a href="javascript:;" hidefocus="ture"  class="old">{$rate}</a>
+<!--
+EOT;
+}}print <<<EOT
+--> 
+			</div>  
+<!--
+EOT;
+}
+if(S::isArray($noneJsonList[$key]['min'])){
+print <<<EOT
+-->
+			<div class="rating_pop cc w">
+<!--
+EOT;
+foreach($noneJsonList[$key]['min'] as $rate){
+if(abs($rate) <= $raterange[$key][mrpd]){print <<<EOT
+-->  
+           		<a href="javascript:;" hidefocus="false" onclick="readByRateOpen(this,'addpoint$key','$key','remain$key');" class="less">{$rate}</a>
+<!--
+EOT;
+}else{print <<<EOT
+-->  
+               <a href="javascript:;" hidefocus="true" class="old">{$rate}</a>
+<!--
+EOT;
+}}print <<<EOT
+--> 
+			</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
 		<td>
-			<label class="mr20"><input type="radio" name="step" value="1" checked onclick="operatesel(1);" id="step"/>评分</label><label><input type="radio" name="step" value="2" onclick="operatesel(2);" id="step"/>取消评分</label>
+			<div class="w"><input class="input mr10" type="text" id="addpoint$key" name="addpoint[]" style="width:30px" value=""/>
+            <input type="hidden" name="cid[]" value="$key" />
+            <span class="rating_pop_surplus">剩余<span id = "remain$key">{$raterange[$key][mrpd]}</span></span></div>
 		</td>
 	</tr>
-	<tr id="cancel" class="tr3" style="display:none">
-		<td>操作说明:</td>
-		<td>取消评分按自己最近的评分开始取消</td>
-	</tr>
-	<tr class="tr3">
-		<td>评分数量:</td>
-		<td>$count 篇</td>
-	</tr>
-    <tr class="tr3">
-		<td>标　　题:</td>
-		<td>{$subject}</td>
-	</tr>
-	<tr id="ok1" class="tr3">
-		<td>积分名称:</td>
-		<td style="padding:0;">
-			<table>
-				<tr class="tr5">
-					<td>名称</td>
-					<td>点数</td>
-					<td align="center">评分区间</td>
-					<td align="center">剩余</td>
-					<td></td>
-				</tr>
-				<tbody id="c_model"><tr class="tr5">
-					<td><select name="cid[]" onchange="optionsel(this)">$creditselect</select></td>
-					<td><input class="input fl" type="text" name="addpoint[]" value="1" size="3" />
-					<a href="javascript:;" class="select_arrow fl" style="margin:2px 0 0 2px;" onclick="readByRateOpen(this);">下拉</a>
-          </td>
-					<td align="center"></td>
-					<td align="center"></td>
-					<td><a href="javascript:" onclick="addoption()" class="s3">[添加]</a></td>
-				</tr></tbody>
-				<tbody id="c_body"></tbody>
-			</table>
-		</td>
-	</tr>
-	<tr class="tr3">
-		<td>消息通知:</td>
-		<td>
-			<label class="mr20"><input type="radio" name="ifmsg" value="1" $check_Y  id="ifmsg"/>开启</label><label><input type="radio" name="ifmsg" value="0" $check_N  id="ifmsg"/>关闭</label>
-		</td>
-	</tr>
-	<tr id="ok3" class="tr3">
-		<td>评分理由:</td>
-		<td>
-			<input type="text" name="atc_content" onchange="cutStrContent();" onkeyup="cutStrContent();" onkeydown="cutStrContent();" id="atc_content" onkeydown="ajax.quickpost(event,this.form)" style="width:312px;" class="input" />
-			<div>
-			<select onchange="this.form.atc_content.value=this.value;cutStrContent();" size="6" style="width:320px;" class="mb5">
+<!--
+EOT;
+}}print <<<EOT
+-->	
+	<tr>
+		<th class="vt">理由：</th>
+		<td colspan="2">
+			<p class="mb10"><textarea name="atc_content" onchange="cutStrContent();" onkeyup="cutStrContent();" onkeydown="cutStrContent();ajax.quickpost(event,this.form)" id="atc_content" placeholder="写点评分理由吧" class="textareaA" style="width:310px;height:20px;"></textarea></p>
+			<select onchange="this.form.atc_content.value=this.value;cutStrContent();" size="6" style="width:318px;">
 				$reason_sel
 			</select>
-			</div>
-			<div>
-				<div id="atc_content_warn" class="gray">限100字节</div>
-			</div>
 		</td>
 	</tr>
+
 <!-- 
 EOT;
 if($showReply){print <<<EOT
 -->
-	<tr class="tr3" id="tdPing">
-		<td class="tar"></td>
-		<td><label for="ifpost"><input type="checkbox" name="ifpost" id="ifpost" value="1" />同时作为回复发表</label></td>
+	<tr id="tdPing">
+		<th></th>
+		<td colspan="2"><input type="checkbox" name="ifpost" id="ifpost" value="1" style="padding:0;margin:-2px 3px 0 0;*margin:0;" /><label for="ifpost">同时作为回复发表</label></td>
 	</tr>
 <!-- 
 EOT;
@@ -113,12 +128,10 @@ $checkCode = L::loadClass('checkcode', 'site');
 $checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
-	<tr class="tr3" id="tr_gdcheck" style="display:none">
-		<td class="tar">验证码:</td>
-		<td>
-			<input class="input fl mr5" onfocus="showgd();" type="text" name="gdcode" size="5" />
-			<div id="ckcode" style="display:none"></div>
-$checkCodeString
+	<tr id="tr_gdcheck" class="vt" style="display:none">
+		<th><span class="w">验证码：</span></th>
+		<td colspan="2">
+			<input class="input mr5" onfocus="showgd();" type="text" name="gdcode" size="5" /><span id="ckcode" style="display:none"></span>$checkCodeString
 	</td>
 </tr>
 <!--
@@ -135,9 +148,9 @@ if($db_imagequestion){
 $q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
-	<tr class="tr3" id="tr_ckquestion" style="display:none">
-		<td class="tar">验证问题:</td>
-		<td>$q_a
+	<tr id="tr_ckquestion" style="display:none">
+		<th><span class="w">验证问题：</span></th>
+		<td colspan="2">$q_a
 			<input class="input" type="text" name="qanswer" size="5"/>
 			<input type="hidden" name="qkey" value="$qkey" />
 		</td>
@@ -167,7 +180,7 @@ EOT;
 print <<<EOT
 -->
 </table>
-
+</div>
 <div id="menu_rate" style="display:none;">
 <!--[if IE 6]>
 <iframe frameborder="0" style="position:absolute;width:60px;height:270px;background:#fff;filter:Alpha(opacity=0);" scrolling="no"></iframe>
@@ -197,15 +210,19 @@ EOT;
 <div class="popBottom">
 <span class="btn2"><span>
 <!--button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form,marked);">提 交</button-->
-<button type="button" name="ajaxsubmit" onclick="operateshowping();">提 交</button>
+<button type="button" name="ajaxsubmit" onclick="operateshowping();">评分</button>
 </span></span></div>
 </div>
 </form>
 <script type="text/javascript">
 function operateshowping() {
 	var thisform = getObj('pingForm');
+	var textarea=getObj("atc_content");
+	var placeholder=textarea.getAttribute("placeholder");
+	if(textarea.value==placeholder){
+		textarea.value="";	
+	}
 	ajax.submit(thisform, function() {
-	//ajax.send('operate.php?action=showping&ajax=1',postp,function(){
 		var rText = ajax.request.responseText.split('\t');
 		if (rText[0]=='success') {
 			var showping = JSONParse(rText[1]);
@@ -216,10 +233,15 @@ function operateshowping() {
 					var pingNum = getObj('pingNum_'+i);
 					if (createpingbox) {
 						getObj('mark_'+i).style.display = '';
-						for (var j in showping[i]) {
-							createpingbox.innerHTML = showPingCommentHTML(createpingbox,showping[i][j]) + createpingbox.innerHTML;
+						for (var j in showping[i]['detail']) {
+							createpingbox.innerHTML = showPingCommentHTML(createpingbox,showping[i]['detail'][j]) + createpingbox.innerHTML;
 							m++;
 						}
+						var totalStr='',total=showping[i]['total'];
+						for(var k in total){
+							totalStr+='，<span>'+k+'<span class="s2 b">'+total[k]+'</span></span>';
+						}
+						getObj('pingTotal_'+i).innerHTML = totalStr;
 					}
 					var pingNums = pingNum.innerHTML ? parseInt(pingNum.innerHTML) : 0;
 					pingNum.innerHTML  = parseInt(m) + pingNums;
@@ -246,57 +268,64 @@ function operateshowping() {
 }
 
 function showPingCommentHTML(element,showping) {
-		return '<table width="100%"><tr id="createpingLogTr_'+showping['pingLogId']+'" class="vt" onmouseover="showPingDelLink(this, true)" onmouseout="showPingDelLink(this, false)"><th class="p_face"><div id="card_pingUserShow_'+showping['pingLogId']+'_'+showping['pingeruid']+'" class="userCard"><img src="'+showping['face']+'" width="16" height="16" /></div><span id="pingUserShow_'+showping['pingLogId']+'"></span></th><td class="p_name"><a target="_blank" href="u.php?uid='+showping['pingeruid']+'">'+showping['pinger']+'</a></td><td  width="60">'+showping['name']+'</td><td class="s2 b" width="40">'+showping['point']+'</td><td width="90">'+showping['pingtime']+'</td><td>'+showping['record']+'</td><td width="20"><a class="adel" style="display:none;" id="pingDel_'+showping['pingLogId']+'" href="javascript:void(0);" onclick=delPingLog("'+showping['fid']+'","'+showping['tid']+'","'+showping['pid']+'","'+showping['pingLogId']+'")>删除</a></td></tr></table>';
+		return '<table width="100%"><tr id="createpingLogTr_'+showping['pingLogId']+'" onmouseover="showPingDelLink(this, true)" onmouseout="showPingDelLink(this, false)"><td width="30" class="read_score_face"><div id="card_pingUserShow_'+showping['pingLogId']+'_'+showping['pingeruid']+'" class="userCard" ><a href="u.php?uid='+showping['uid']+'" ><img src="'+showping['face']+'" width="20" height="20" /></a><span id="pingUserShow_'+showping['pingLogId']+'"></span></div></td><td width="45"><a target="_blank" href="u.php?uid='+showping['uid']+'" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid='+showping['uid']+'" class=" _cardshow s4 w mr10" data-card-key="'+showping['pinger']+'">'+showping['pinger']+'</a></td><td width="60"><span class="mr10 w">'+showping['name']+'&nbsp;<span class="s2 b">'+showping['point']+'<span></span></td><td>'+showping['record']+'</td><td class="gray read_score_time" width="100"><a class="s4" style="display:none;" id="pingDel_'+showping['pingLogId']+'" href="javascript:void(0);" onclick=delPingLog("'+showping['fid']+'","'+showping['tid']+'","'+showping['pid']+'","'+showping['pingLogId']+'")>删除</a>'+showping['pingtime']+'</td></tr></table>';
 }
 </script>
 
 <script>
-setTimeout(function() {
-	showoption(getObj('c_model'));
-	initCheckTextNum('atc_content','atc_content_warn', 100);
-}, 100);
+onReady(function(){
+	//评分弹窗textarea提示文字切换
+	function hasPlaceHolder(){
+		var inp=document.createElement("input");
+		return "placeholder" in inp;
+	}
+	function placeHolder(elem,txt){
+		if(!hasPlaceHolder()){
+			var placeholder;
+			if(elem.getAttribute("placeholder")){
+				placeholder=elem.getAttribute("placeholder");
+			}
+			elem.value=placeholder;
+			var style=elem.style;
+			style.color="#888";
+			addEvent(elem,"focus",function(){
+				if(this.value==placeholder){
+					this.value="";
+					style.color="#000";
+				}
+			})
+			addEvent(elem,"blur",function(){
+				if(this.value.replace(/\s*/g,"")==""){
+					this.value=placeholder;
+					style.color="#888";
+				}
+			})
+		}
+	}
+	placeHolder(getObj("atc_content"));
+	//end
+})
 //var readByRate = new PwMenu('raterange');
-
-function addoption() {
-	var s = getObj('c_model').firstChild.cloneNode(true);
-	var td = s.getElementsByTagName('td');
-	var sel = s.getElementsByTagName('select')[0];
-	optionsel(sel);
-	td[4].innerHTML = '<a href="javascript:" class="s4" onclick="deloption(this)">[删除]</a>';
-	getObj('c_body').appendChild(s);
-}
-function deloption(o) {
-	getObj('c_body').removeChild(o.parentNode.parentNode);
-}
-
 var lineNode;
 var ratelist = JSONParse('$ratelist');
 
-function optionsel(o) {
-	var jscredit = JSONParse('$jscredit');
-	var tr = o.parentNode.parentNode;
-	var td = tr.getElementsByTagName('td');
-	var v = o.value;
-	td[2].innerHTML = jscredit[v]['minper'] + '~' + jscredit[v]['maxper'];
-	td[3].innerHTML = '<span class="s2 b">' + jscredit[v]['leavepoint'] + '</span>';
-}
-function showoption(o) {
-	var sel = o.getElementsByTagName('select')[0];
-	optionsel(sel);
-}
-
 function getRate(e)
 {
-	e = e||window.event;
+	var e = e||window.event;
+	var elem=e.target||e.srcElement;
 	//e.cancelBubble = true;
-	if(e.srcElement.tagName=='A'){
-		lineNode.getElementsByTagName('input')[0].value=parseInt(e.srcElement.innerHTML);
+	if(elem.tagName=='A'){
+		lineNode.getElementsByTagName('input')[0].value=parseInt(elem.innerHTML);
 	}
 }
 
-function readByRateOpen(e)
+function readByRateOpen(obj,id,o,remain)
 {
-	var menu_rate = getObj('menu_rate');
+	var jscredit = JSONParse('$jscredit');
+	var val = parseInt(obj.innerHTML);
+	document.getElementById(remain).innerHTML = parseInt(jscredit[o]['leavepoint'])-Math.abs(val);
+	getObj(id).value=val;
+	/*var menu_rate = getObj('menu_rate');
 	lineNode = e.parentNode.parentNode;
 	var ul = getObj('menu_rate').getElementsByTagName('ul')[0];
 	var tr = e.parentNode.parentNode;
@@ -315,7 +344,7 @@ function readByRateOpen(e)
 	document.body.onmousedown = function(){
 		document.body.onmousedown = null;
 		menu_rate.style.display = 'none';
-	};
+	};*/
 }
 function rateInput(val)
 {
@@ -341,7 +370,6 @@ function operatesel (id) {
 }
 var charset = '$db_charset';
 </script>
-
 <!--
 EOT;
 }elseif($action=='shield'){print <<<EOT
@@ -400,9 +428,9 @@ EOT;
 <input type="hidden" name="page" value="$page" />
 </form>
 <script>
-setTimeout(function() {
+onReady(function(){
 	initCheckTextNum('atc_content','atc_content_warn', 100);
-}, 100);
+})
 </script>
 <!--
 EOT;
@@ -463,9 +491,9 @@ EOT;
 <input type="hidden" name="page" value="$page" />
 </form>
 <script>
-setTimeout(function() {
+onReady(function(){
 	initCheckTextNum('atc_content','atc_content_warn', 100);
-}, 100);
+})
 </script>
 <!--
 EOT;
@@ -1059,6 +1087,11 @@ print<<<EOT
 
 <script>
 function commentspics(form){
+	var content = form.comments_content.value;
+	if(content == ''){
+		showDialog("error","内容不能为空!",2);
+		return false;
+	}
 	ajax.submit(form, function() {
 		var gotText = ajax.request.responseText;
 		if ('success' != gotText) {

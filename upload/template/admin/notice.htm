@@ -26,11 +26,6 @@ if(in_array($action,array('add','edit'))){print <<<EOT
 		<div class="help_a"> </div></td>
 	</tr>
 	<tr class="tr1 vt">
-		<td class="td1">公告标题 <span class="s1">*</span></td>
-		<td class="td2"><input name="atc_title" class="input input_wa" value="$subject" /></td>
-		<td class="td2"><div class="help_a"> </div></td>
-	</tr>
-	<tr class="tr1 vt">
 		<td class="td1">起始日期 - 结束日期</td>
 		<td class="td2">
         <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input id="startdate" name="startdate" value="$startdate" type="text" onclick="ShowCalendar(this.id,1)" /></div>
@@ -47,31 +42,33 @@ if(in_array($action,array('add','edit'))){print <<<EOT
 		<td class="td2"><div class="help_a"> </div></td>
 	</tr>
 	<tbody id="ifurl" onload="return viewdetail();">
-<!--
-EOT;
-if(strpos($ckdisplay,",$fid,")!==false){print <<<EOT
--->
-		<tr class="tr1 vt">
-			<td class="td1">公告链接 </td>
-			<td class="td2"><input name="url" value="$url" class="input input_wb"></td>
-			<td class="td2"><div class="help_a">
-将跳转到指定到某一个链接，如:http://www.phpwind.net/。<br />
-<font color="red">注:若填写此处，内容可不需填写。</font> </div></td>
-		</tr>
-<!--
-EOT;
-}print <<<EOT
--->
 	</tbody>
-	<tr class="tr1 vt"r>
-		<td class="td1">公告内容</td>
-		<td class="td2" colspan="2"><div style="width:680px;background:#fff;" class="cc">
+	<tr class="tr1 vt">
+		<td class="td1">公告内容 <span class="s1">*</span></td>
+		<td class="td2" colspan="2">
+	  <p class="mb10"><input name="atc_title" class="input input_wb" value="$subject" /></p>
+		<div style="width:680px;background:#fff;" class="cc">
 <!--
 EOT;
 require_once PrintEot('wysiwyg_editor_common');
 print <<<EOT
 -->
 		</div></td>
+	</tr>
+	<tr class="tr1">
+		<td class="td1">公告指向链接</td>
+		<td class="td2"><!--
+EOT;
+if(strpos($ckdisplay,",$fid,")!==false){print <<<EOT
+-->
+		<p class="mb10"><input name="url" value="$url" class="input input_wb"></p>
+		
+<!--
+EOT;
+}print <<<EOT
+--></td><td class="td2"><div class="help_a">
+将跳转到指定到某一个链接，如:http://www.phpwind.net/。<br />
+<span class="s1">注:若填写此处，内容可不需填写。</span> </div></td>
 	</tr>
 </table>
 </div>

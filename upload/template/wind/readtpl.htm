@@ -17,8 +17,8 @@ EOT;
 SCR == 'read' && require PrintEot('read_css');
 print <<<EOT
 -->
-<script type="text/javascript" src="js/pw_ajax.js"></script>
 <script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
 <script>
 var imgpath = '$imgpath';
 var verifyhash = '$verifyhash';
@@ -703,7 +703,7 @@ print <<<EOT
 <!--
 EOT;
 	if ($db_showonline) {
-	$gender = $read['gender'] == 2 ? 'women' : 'man';
+	$gender = getDefaultGender($read['gender']);
 		if (checkOnline($read['thisvisit'])) {print <<<EOT
 -->
 							<span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span>
@@ -792,7 +792,7 @@ print <<<EOT
 											</ul>
 										</dd>
 										<dd class="ddB">
-											<a href="{$db_userurl}$read[authorid]" class="add_home">访问TA的空间</a><a href="javascript:;" onClick="sendmsg('pw_ajax.php?action=addfriend&touid=$read[authorid]')" class="add_fri">加好友</a><a href="javascript:;" onClick="sendmsg('pw_ajax.php?action=usertool&uid=$read[authorid]')" class="add_pro">用道具</a>
+											<a href="{$db_userurl}$read[authorid]" class="add_home">访问TA的空间</a><a href="javascript:;" onClick="sendmsg('pw_ajax.php?action=addfriend&touid=$read[authorid]')" class="add_fri">加好友</a><a href="javascript:;" onClick="sendmsg('pw_ajax.php?action=usertool&uid=$read[authorid]','',this.id)" class="add_pro">用道具</a>
 										</dd>
 									</dl>
 								</div>
@@ -1403,7 +1403,7 @@ if($htmlAdvert){print <<<EOT
 EOT;
 }if($db_iftag && $read['tag']){print <<<EOT
 -->
-					<div class="tal mb10">关键词: {$read[tag]}</div>
+					<div class="tal mb10">关键词： {$read[tag]}</div>
 <!--
 EOT;
 }
@@ -1868,8 +1868,9 @@ $db_phopen && $imageConfigTabs[] = 'album';
 $imageConfigTabs[] = 'network';
 $imageConfigTabs = "'" . implode("','", $imageConfigTabs) . "'";
 //max attachnum
-if ($_G['allownum'] > 0 && $_G['allownum'] - $winddb['uploadnum']<$db_attachnum){
-	$maxAttachnum = $_G['allownum'] - $winddb['uploadnum'];
+$uploadedNum = $winddb['uploadtime'] < $tdtime ? 0 : $winddb['uploadnum'];
+if ($_G['allownum'] > 0 && $_G['allownum'] - $uploadedNum<$db_attachnum){
+	$maxAttachnum = $_G['allownum'] - $uploadedNum;
 } else {
 	$maxAttachnum = $db_attachnum;
 }
@@ -2011,7 +2012,7 @@ function postfloor(){
 		if(getObj('creditlocation')){
 			setTimeout(function(){
 					getObj('creditlocation').parentNode.removeChild(getObj('creditlocation'));;
-				},1000);
+				},3000);
 		};
 	});
 }

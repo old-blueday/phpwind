@@ -415,6 +415,7 @@ EOT;
 }print <<<EOT
 -->
 </table>
+<div class="popBottom"><a href="profile.php?action=toolcenter" target="_blank" class="s4">购买道具</a></div>
 </div>
 <!--
 EOT;
@@ -446,6 +447,7 @@ EOT;
 }print <<<EOT
 -->
 </table>
+<div class="popBottom"><a href="profile.php?action=toolcenter" target="_blank" class="s4">购买道具</a></div>
 </div>
 <!--
 EOT;
@@ -634,6 +636,9 @@ print <<<EOT
 <table width="100%" class="vt">
 	<tr><td width="60">作者:</td><td>$atcdb[author]</td></tr>
 	<tr><td>标题:</td><td><input class="input input_wb" type="text" name="atc_title" value="$atc_title" /></td></tr>
+	<tr><td>内容</td><td>
+		<textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA" style="height:120px;">$atc_content</textarea>
+	</td></tr>
 <!--
 EOT;
 if(($db_gdcheck & 4) && (!$db_postgd || $winddb['postnum'] < $db_postgd)){
@@ -665,9 +670,6 @@ print <<<EOT
 EOT;
 }print <<<EOT
 -->
-	<tr><td>内容</td><td>
-		<textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA" style="height:120px;">$atc_content</textarea>
-	</td></tr>
 </table>
 <input type="hidden" name="step" value="2" />
 <input type="hidden" name="fid" value="$fid" />

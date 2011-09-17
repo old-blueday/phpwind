@@ -22,8 +22,8 @@ if ($username && !$uid) {
 }
 $isGM = S::inArray($windid, $manager);
 !$isGM && $groupid==3 && $isGM=1;
-$indexRight = $newSpace->viewRight('index');
-$indexValue = $newSpace->getPrivacyByKey('index');
+$indexRight = $newSpace->viewRight('photos');
+$indexValue = $newSpace->getPrivacyByKey('photos');
 $isSpace = false;
 if ($uid && intval($uid) > 0) {
 	$isSpace = true;

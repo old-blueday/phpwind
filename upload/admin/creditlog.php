@@ -31,12 +31,12 @@ if (empty($action)) {
 	$uid && $sqladd .= " AND uid=".S::sqlEscape($uid);
 	$ctype && $sqladd .= " AND ctype=".S::sqlEscape($ctype);
 	if ($stime) {
-		!is_numeric($stime) && $stime = PwStrtoTime($stime);
-		$sqladd .= " AND adddate>".S::sqlEscape($stime);
+		!is_numeric($stime) && $starttime = PwStrtoTime($stime);
+		$sqladd .= " AND adddate>".S::sqlEscape($starttime);
 	}
 	if ($etime) {
-		!is_numeric($etime) && $etime = PwStrtoTime($etime);
-		$sqladd .= " AND adddate<".S::sqlEscape($etime);
+		!is_numeric($etime) && $endtime = PwStrtoTime($etime);
+		$sqladd .= " AND adddate<".S::sqlEscape($endtime+86400);
 	}
 	if ($optype) {
 		if (is_array($optype)) {
@@ -205,12 +205,13 @@ function updateMergeCreditlogTable() {
 		if ($key && !is_numeric($key)) continue;
 		$createTable[] = $rt['Name'];
 	}
+	$engineType = $db->server_info() > '4.1' ? 'ENGINE=MERGE' : 'TYPE=MERGE';
 	$creatTableStructure= $db->get_one("SHOW CREATE TABLE `pw_creditlog`");
 	preg_match('/\(.+\)/is', $creatTableStructure['Create Table'], $match);
 	preg_match('/CHARSET=([^;\s]+)/is', $creatTableStructure['Create Table'], $charsetMatch);
 	$db->query('DROP TABLE IF EXISTS `pw_merge_creditlog`');
 	ksort($createTable);
-	$createTableSql = 'CREATE TABLE `pw_merge_creditlog` ' . $match[0] . ' TYPE=MERGE UNION=(' . implode(',', $createTable) . ') DEFAULT CHARSET=' . $charsetMatch[1] . ' INSERT_METHOD=LAST';
+	$createTableSql = 'CREATE TABLE `pw_merge_creditlog` ' . $match[0] . " $engineType UNION=(" . implode(',', $createTable) . ') DEFAULT CHARSET=' . $charsetMatch[1] . ' INSERT_METHOD=LAST';
 	$db->query($createTableSql);
 	
 	$success = $db->get_one("SHOW TABLE STATUS LIKE 'pw_merge_creditlog'");

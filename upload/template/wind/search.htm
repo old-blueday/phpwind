@@ -233,12 +233,12 @@ EOT;
 }
 if($sch['topped']==4){print <<<EOT
 -->
-<img src="$imgpath/pwicon/headtopic_$sch[topped].gif" alt="置顶帖标志" />						
+<img src="$imgpath/pwicon/headtopic_$sch[topped].gif" alt="置顶帖" />						
 <!--
 EOT;
 }elseif($sch['topped']){print <<<EOT
 -->
-<img src="$imgpath/$stylepath/file/headtopic_$sch[topped].gif" alt="置顶帖标志" />
+<img src="$imgpath/$stylepath/file/headtopic_$sch[topped].gif" alt="置顶帖" />
 <!--
 EOT;
 }print <<<EOT
@@ -259,7 +259,7 @@ print <<<EOT
 EOT;
 if($sch[digest]){print <<<EOT
 -->
-<img src="$imgpath/$stylepath/file/digest_$sch[digest].gif" alt="精华帖标志" />
+<img src="$imgpath/$stylepath/file/digest_$sch[digest].gif" alt="精华帖" />
 <!--
 EOT;
 }print <<<EOT

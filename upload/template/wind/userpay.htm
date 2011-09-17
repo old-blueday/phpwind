@@ -117,7 +117,7 @@ EOT;
 						<div class="b s5">积分充值过程:</div><ol>
 	<li>填写信息:进入积分充值页面，填写充值金额，并选择支付方式，提交进入下一步</li>
 	<li>生成订单:系统自动生成一条充值订单记录，等待用户付款，此时订单状态为“未支付订单”</li>
-	<li>用户付款:进入付款页面，当您付款给成功后，订单信息会变为“已完成订单”状态，同时系统会给您的积分帐户冲入相应的金额</li></ol>
+	<li>用户付款:进入付款页面，当您付款成功后，订单信息会变为“已完成订单”状态，同时系统会给您的积分帐户充入相应的金额</li></ol>
 						</div>
 						<div class="bor-t-c mb10"></div>
 						<div style="padding:10px 5px;">
@@ -187,7 +187,7 @@ EOT;
 <script>
 var creditinfo = $creditinfo;
 function payinfo(c) {
-	getObj('payinfo').innerHTML = '当前汇率:' + creditinfo[c][0] + ' ' + creditinfo[c][2] + ' = ￥1（最低 ' + creditinfo[c][1] + ' 元人民币 ）';
+	getObj('payinfo').innerHTML = '当前汇率:' + creditinfo[c][0] + ' ' + creditinfo[c][2] + ' = ￥1（最低充值 ' + creditinfo[c][1] + ' 元人民币 ）';
 }
 payinfo(getObj('paycredit').value);
 </script>

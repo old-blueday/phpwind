@@ -6,7 +6,9 @@
 <title>{$db_bbsname} - powered by phpwind.net</title>
 <script>
 if(window.frameElement){
-	parent.location.href = window.location.href;
+	try{
+		parent.location.href = window.location.href;
+	}catch(e){}
 }
 </script>
 <link href="images/admin/layout83/pw_reset.css?{$GLOBALS['wind_repair']}" rel="stylesheet" />

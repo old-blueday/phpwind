@@ -315,7 +315,7 @@ if ($_POST['action'] == 'save') {
 
 function banksave($uid,$money,$bankdb,$type) {
 	global $db,$timestamp,$bk_rate,$bk_ddate,$bk_drate,$credit;
-	
+	$money = intval($money);
 	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 
 	if ($type == 1) {
@@ -352,7 +352,7 @@ function banksave($uid,$money,$bankdb,$type) {
 
 function bankdraw($uid,$money,$bankdb,$type) {
 	global $db,$timestamp,$bk_rate,$bk_ddate,$bk_drate;
-	
+	$money = intval($money);
 	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 	
 	if ($type == 1) {

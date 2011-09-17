@@ -1,9 +1,3 @@
-function CheckAll(form){
-	for (var i=0;i<form.elements.length;i++){
-		var e = form.elements[i];
-		e.checked == true ? e.checked = false : e.checked = true;
-	}
-}
 function displayElement(elementId,buttonId,isDisplay) {
 	if (undefined == isDisplay && typeof buttonId === 'string') {
 		getObj(elementId).style.display = getObj(elementId).style.display == 'none' ? '' : 'none';	

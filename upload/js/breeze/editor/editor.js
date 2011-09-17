@@ -59,7 +59,7 @@ B.require('dom', 'event', function(B){
 			var defaultText=B.toolbarCommands.fontSelector[5].defaultText;
 			doc.write('<html><head>\
 			<style>body{border:0px;font-family:'+defaultText+';font-size:14px;margin:0;padding:0;line-height:1.8;word-wrap:break-word;height:100%;}\
-			p{margin:0;}img{border:0;max-width:320px;}\
+			p{margin:0;}img{border:0;max-width:320px;cursor:default;}\
 			table{border-collapse:collapse;font-size:14px;}pre{border:1px dashed #FF33FF;background:#FFddFF}\
 			.blockquote{zoom:1;border:1px dashed #CCC;background:#f7f7f7;padding:5px 10px;margin:10px 10px 0;}\
 			.B_code{border: 1px solid; border-color: #c0c0c0 #ededed #ededed #c0c0c0;margin:1em;padding:0 0 0 3em;overflow:hidden;background:#ffffff; font:12px/2 Simsun;}\
@@ -74,7 +74,18 @@ B.require('dom', 'event', function(B){
 			this.iframe = iframe;
 			this.editor.div = div;
 			B.addEvent(doc, 'mouseup', this.editor.updateToolbar.bind(this.editor));
-			B.addEvent(doc, 'click', function(){
+			B.addEvent(doc, 'click', function(e){
+				var e=e||window.event;
+				var elem=e.target||e.srcElement;
+				//图片点击选中
+				if(elem.tagName&&elem.tagName.toLowerCase()=="img"){
+					var sel = self.getSel(), rng = self.getRng();
+					if(B.UA.webkit){
+						rng.selectNode(elem);
+						sel.removeAllRanges();
+						sel.addRange(rng);
+					}
+				}
 				B.$('#breeze-colorPicker') && (B.$('#breeze-colorPicker').style.display = 'none');
 			});
 			B.addEvent(doc.body, 'mousedown', function(e){
@@ -780,8 +791,8 @@ B.require('dom', 'event', function(B){
 				}
 				B.editor[val](elem, function(str){
 					mode.pasteHTML(str);
+					editor.restoreRng();
 				}, txt, '');
-				editor.restoreRng();
 			});
 			evt.preventDefault();
 		});

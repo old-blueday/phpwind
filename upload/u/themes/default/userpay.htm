@@ -107,11 +107,11 @@ if ($logdb) {print <<<EOT
 							   <div class="u-box-a mb20">
 									<table width="100%" class="tA">
 										<tr class="tr">
-											<td>ID</td>
-											<td>操作</td>
-											<td>奖惩</td>
+											<td width="30">ID</td>
+											<td width="60">操作</td>
+											<td width="70">奖惩</td>
 											<td>描述</td>
-											<td width="150">时间</td>
+											<td width="100">时间</td>
 										</tr>
 <!--
 EOT;
@@ -142,7 +142,7 @@ EOT;
 									<div class="spaceTip"><div class="b s5">积分充值过程:</div><ol>
 	<li>填写信息:进入积分充值页面，填写充值金额，并选择支付方式，提交进入下一步</li>
 	<li>生成订单:系统自动生成一条充值订单记录，等待用户付款，此时订单状态为“未支付订单”</li>
-	<li>用户付款:进入付款页面，当您付款给成功后，订单信息会变为“已完成订单”状态，同时系统会给您的积分帐户冲入相应的金额</li></ol></div>
+	<li>用户付款:进入付款页面，当您付款成功后，订单信息会变为“已完成订单”状态，同时系统会给您的积分帐户充入相应的金额</li></ol></div>
 									<div class="p15">
 										<table width="100%" class="setTable">
 											<tr>
@@ -161,7 +161,7 @@ EOT;
 }print <<<EOT
 -->
 													</select>
-													&nbsp;&nbsp;<span class="s2"><span id="payinfo"></span></span>
+													<p><span id="payinfo"></span></p>
 												</td>
 											</tr>
 											<tr>
@@ -174,23 +174,23 @@ EOT;
 											</tr>
 										<tr>
 											<th class="th">支付方式: </th>
-											<td class="td">
-												<label class="mr20"><input type="radio" name="method" value="2" checked /> 支付宝</label>
+											<td class="td" style="padding-left:10px;">
+												<div class="fl mb10 mr20"><input id="radio_alipay" type="radio" name="method" value="2" checked /><label for="radio_alipay"><img src="$imgpath/post/alipay.gif" alt="支付宝" align="absmiddle" /></label></div>
 <!--
 EOT;
 if($ol_tenpay && $ol_tenpaycode){print <<<EOT
 -->
-												<label class="mr20"><input type="radio" name="method" value="4" /> 财付通</label>
+												<div class="fl mb10 mr20"><input id="radio_tenpay" type="radio" name="method" value="4" /><label for="radio_tenpay"><img src="$imgpath/post/tenpay.gif" alt="财付通" align="absmiddle" /></label></div>
 <!--
 EOT;
 }if($ol_paypal && $ol_paypalcode){print <<<EOT
 -->
-												<label class="mr20"><input type="radio" name="method" value="1" /> 贝宝</label>
+												<div class="fl mb10 mr20"><input id="radio_paypal" type="radio" name="method" value="1" /><label for="radio_paypal"><img src="$imgpath/post/paypal.gif" alt="贝宝" align="absmiddle" /></label></div>
 <!--
 EOT;
 }if($ol_99bill && $ol_99billcode){print <<<EOT
 -->
-												<label><input type="radio" name="method" value="3" /> 快钱</label>
+												<div class="fl mb10"><input id="radio_99bill" type="radio" name="method" value="3" /><label for="radio_99bill"><img src="$imgpath/post/99bill.gif" alt="快钱" align="absmiddle" /></label></div>
 <!--
 EOT;
 }print <<<EOT
@@ -204,7 +204,7 @@ EOT;
 							<script>
 								var creditinfo = $creditinfo;
 								function payinfo(c) {
-									getObj('payinfo').innerHTML = '当前汇率:' + creditinfo[c][0] + ' ' + creditinfo[c][2] + ' = ￥1（最低 ' + creditinfo[c][1] + ' 元人民币 ）';
+									getObj('payinfo').innerHTML = '当前汇率:' + creditinfo[c][0] + ' ' + creditinfo[c][2] + ' = ￥1（最低充值 ' + creditinfo[c][1] + ' 元人民币 ）';
 								}
 								
 								function calculateMoney(obj) {
@@ -216,7 +216,7 @@ EOT;
 										return false;
 									}
 									getObj('moneynumber').value = moneyNumber;
-									getObj('moneyinfo').innerHTML = '(所需人民币' + moneyNumber + '元)';
+									getObj('moneyinfo').innerHTML = '需充值人民币' + moneyNumber + '元';
 									getObj('buysubmit').disabled = false;
 								}
 								payinfo(getObj('paycredit').value);

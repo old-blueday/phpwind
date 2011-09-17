@@ -208,14 +208,18 @@ EOT;
 	<a title="加入到版主推荐列表" href="mawhole.php?ajax=1&action=commend&fid=$fid&type=batch" onclick="return postManage.action(this,1)" id="commend" class="bta fl">版主推荐</a>
 <!--
 EOT;
-}if($forumset['overprint'] && ($isGM || $pwSystem['overprint'] )){print <<<EOT
+}print <<<EOT
 -->
-	<a title="印戳" href="mawhole.php?ajax=1&action=multioverprint&fid=$fid&type=batch" onclick="return postManage.action(this,1)" id="overprint" class="bta fl">印戳</a>
+		</div>
+<!--
+EOT;
+if($forumset['overprint'] && ($isGM || $pwSystem['overprint'] )){print <<<EOT
+-->
+<div class="cc mb10"><a title="印戳" href="mawhole.php?ajax=1&action=multioverprint&fid=$fid&type=batch" onclick="return postManage.action(this,1)" id="overprint" class="bta fl">印戳</a></div>
 <!--
 EOT;
 }print <<<EOT
 -->
-		</div>
 <!--
 EOT;
 }print <<<EOT
@@ -296,6 +300,7 @@ print<<<EOT
 -->
 	</ul>
 	$msg_guide
+	<a href="rss.php?fid=$fid" target="_blank" title="订阅"><img src="$imgpath/pwicon/rss.png" align="absmiddle" alt="订阅" /></a>
 </div>
 <div id="pw_content" class="mb10">
 <!--
@@ -339,18 +344,18 @@ EOT;
 }print <<<EOT
 -->
 					</span>
-					<h2 class="mr20 fl f14">{$foruminfo[name]}</h2>
+					<h2 class="mr5 fl f14">{$foruminfo[name]}</h2>
 					<span id="shortcut">
 <!--
 EOT;
 if (strpos($winddb['shortcut'],','.$fid.',') !== false) {print <<<EOT
 -->
-						<a href="javascript:;" onclick="javascript:shortCut();" title="将本版块移除出我的书签" class="keepOn mr10">已收藏</a>
+						<a href="javascript:;" onclick="javascript:shortCut();" title="将本版块移除出我的书签" class="keepOn">已收藏</a>
 <!--
 EOT;
 } else {print <<<EOT
 -->
-						<a href="javascript:;" onclick="javascript:shortCut();" title="将本版块添加到我的书签" class="keep mr10">收藏</a>
+						<a href="javascript:;" onclick="javascript:shortCut();" title="将本版块添加到我的书签" class="keep">收藏</a>
 <!--
 EOT;
 }print <<<EOT
@@ -365,9 +370,8 @@ if ($forumappinfo['thread']) {print <<<EOT
 EOT;
 }print <<<EOT
 -->
-					<a href="rss.php?fid=$fid" target="_blank" class="rss mr10">订阅</a>
         </div>
-        <div class="threadInfo " style="overflow:hidden;">
+        <div class="threadInfo mb10" style="overflow:hidden;">
         	<table width="100%">
 						<tr class="vt">
 							<td width="10">
@@ -465,6 +469,17 @@ print <<<EOT
 		<div class="sidePd10 mb10">
 <!--
 EOT;
+$yunsearchKeywordList = CloudWind::getSearchKeywordsForList($GLOBALS['fid'],$GLOBALS['winduid']);
+if($yunsearchKeywordList){
+print <<<EOT
+-->
+$yunsearchKeywordList
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
 $thread_children && require_once PrintEot($thread_children);
 print <<<EOT
 -->
@@ -494,7 +509,7 @@ if($N_allowtypeopen && ($foruminfo['allowtype'] != 1 || $modelids || $pcids || $
 EOT;
 if(($foruminfo['allowtype'] != 1 || $modelids || $pcids || $_G['allowactivity'] && $firstactmid) && $foruminfo['allowtype'] & 1){print <<<EOT
 -->
-		<li><a href="post.php?fid=$fid" title="新帖" hidefocus="true">新帖</a></li>
+		<!-- li><a href="post.php?fid=$fid" title="新帖" hidefocus="true">新帖</a></li -->
 <!--
 EOT;
 }if($foruminfo['allowtype'] & 2 && $_G[allownewvote]){print <<<EOT
@@ -589,7 +604,7 @@ EOT;
 EOT;
 }if($foruminfo['allowtype'] & 16){print <<<EOT
 -->
-        <!--<li $tmpStyle_4><a href="thread.php?fid=$fid&special=4#tabA">商品</a></li>-->
+        <li $tmpStyle_4><a href="thread.php?fid=$fid&special=4#tabA">商品</a></li>
 <!--
 EOT;
 }if($foruminfo['allowtype'] & 32){print <<<EOT
@@ -791,7 +806,6 @@ if ($modelid > 0 || $pcid > 0) {
 	require_once PrintEot('thread_maincommon');
 }print<<<EOT
 -->
-</div>
 <!--
 EOT;
 if($managecheck && $search != 'img'){print <<<EOT
@@ -917,12 +931,18 @@ EOT;
 	<a href="javascript:;" onclick="submitAction(document.mawhole,'multioverprint');return false;" class="bta fl">印戳</a>
 <!--
 EOT;
-}}
+}
 print <<<EOT
 -->
 	</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
 <input type="hidden" name="action" value="" />
 </form>
+</div>
 <script type="text/javascript">
 function submitAction(aForm,action){
 	//var tidarray = aForm['tidarray[]'];
@@ -974,8 +994,8 @@ print <<<EOT
 <script type="text/javascript">
 var fid = '$fid';
 var forumtitle = "$jsforumtitle";
-var imgok = "keep mr10";
-var imgno = "keepOn mr10";
+var imgok = "keep";
+var imgno = "keepOn";
 var myshortcut = $myshortcut;
 function Fjump(value){
 	if(value!=''){
@@ -992,7 +1012,8 @@ var page = parseInt('$page');
 if(totalpage > 1){
 	document.onkeydown=function(e){
 		var e = window.event || e;
-		var tagname = e.srcElement.tagName || e.target.tagName;
+		var element=e.target||e.srcElement;
+		var tagname = element.tagName || element.tagName;
 		if(tagname == 'INPUT' || tagname == 'TEXTAREA'){
 			return;
 		}
@@ -1018,7 +1039,7 @@ function shortCut() {
 		var rText = ajax.request.responseText.split('\t');
 		try {
 			if (typeof(rText[1]) != 'undefined' && rText[1] == 'successok') {
-				getObj('shortcut').innerHTML = "<a href=\"javascript:;\" onclick=\"javascript:shortCut();\" title=\"将本版块移除出我的书签\" class=\"keepOn mr10\">已收藏</a>";
+				getObj('shortcut').innerHTML = "<a href=\"javascript:;\" onclick=\"javascript:shortCut();\" title=\"将本版块移除出我的书签\" class=\"keepOn\">已收藏</a>";
 				var shortcutforum = getObj('shortcutforum');
 				var forumBooks = getObj('forumBooks');
 				if (myshortcut == false) {

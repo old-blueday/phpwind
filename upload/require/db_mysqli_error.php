@@ -4,8 +4,9 @@
 Class DB_ERROR {
 	function DB_ERROR($msg) {
 		global $db_bbsname,$db_obstart,$REQUEST_URI,$dbhost,$db,$pwServer,$db_charset;
-		$sqlerror = mysqli_error($db->getCurrentDb()->sql);
-		$sqlerrno = mysqli_errno($db->getCurrentDb()->sql);
+		$tmp = $db->getCurrentDb();
+		$sqlerror = mysqli_error($tmp->sql);
+		$sqlerrno = mysqli_errno($tmp->sql);
 		$sqlerror = str_replace($dbhost,'dbhost',$sqlerror);
 		ob_end_clean();
 		$db_obstart && function_exists('ob_gzhandler') ? ob_start('ob_gzhandler') : ob_start();

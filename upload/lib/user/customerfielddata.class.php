@@ -47,7 +47,7 @@ class PW_CustomerFieldData{
 			case 'alipay':
 				$userService = L::loadClass('userservice','user'); /* @var $userService PW_UserService */
 				if($userService->getUserStatus($uid,PW_USERSTATUS_AUTHALIPAY)) return true;
-				$setCheck = $this->setDataAlipay($uid, $tableName, $fieldName);
+				$setCheck = $this->setDataAlipay($uid, $tableName, $fieldName,$fieldInfo['required']);
 				$check = $fieldInfo['required']? $setCheck : true;
 				break;
 			default:
@@ -132,7 +132,7 @@ class PW_CustomerFieldData{
 		return true;
 	}
 
-	function setDataAlipay($uid,$tableName,$fieldName){
+	function setDataAlipay($uid,$tableName,$fieldName,$required = false){
 		if (!$this->memberData[$uid][$tableName]['tradeinfo']){
 			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 			$userInfo = $userService->get($uid, true, false, true);
@@ -141,7 +141,7 @@ class PW_CustomerFieldData{
 		}
 		$tradeInfo = @(array)unserialize($userInfo['tradeinfo']);
 		$tradeInfo[$fieldName] = S::escapeChar(S::getGP($fieldName, 'P'));
-		if ($tradeInfo[$fieldName] && $this->checkAlipay($tradeInfo[$fieldName]) === true) {
+		if (!$required && !$tradeInfo[$fieldName] || $tradeInfo[$fieldName] && $this->checkAlipay($tradeInfo[$fieldName]) === true) {
 			$this->memberData[$uid][$tableName]['tradeinfo'] = serialize($tradeInfo);
 			return true;
 		} else {

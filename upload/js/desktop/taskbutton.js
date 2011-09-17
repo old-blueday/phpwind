@@ -60,14 +60,13 @@ function()
 		this.element.oncontextmenu=function()
 		{
 			_this.oncontextmenu({clientX:event.clientX,clientY:event.clientY});
-			event.returnValue=false;
 			return false;
 		};
-		this.element.attachEvent("onmouseover",function()
+		addEvent(this.element,"mouseover",function()
 		{
 			//_this.element.lastChild.style.display="";
 		});
-		this.element.attachEvent("onmouseout",function()
+		addEvent(this.element,"mouseout",function()
 		{
 			//_this.element.lastChild.style.display="none";
 		});

@@ -13,14 +13,10 @@ if ($o_weibophoto != 1) Showmsg('新鲜事发图片功能已关闭');
 
 $aid = $db->get_value("SELECT aid FROM pw_cnalbum WHERE atype='0' AND ownerid=" . S::sqlEscape($winduid) . " AND isdefault=1 " . S::sqlLimit(1));
 if (!$aid) {
-	if ($groupid != 3 && $o_photos_groups && strpos($o_photos_groups,",$groupid,") === false) {
-		Showmsg('photos_group_right');
-	}
 	/* //unlimit
 	if ($o_albumnum2 > 0 && $o_albumnum2 <= $db->get_value("SELECT COUNT(*) AS count FROM pw_cnalbum WHERE atype='0' AND ownerid=" . S::sqlEscape($winduid))) {
 		Showmsg('colony_album_num2');
 	}
-	*/
 	
 	require_once(R_P.'require/credit.php');
 	$o_photos_creditset['Createalbum'] = @array_diff($o_photos_creditset['Createalbum'],array(0));
@@ -41,7 +37,7 @@ if (!$aid) {
 	if ($creditlog = unserialize($o_photos_creditlog)) {
 		addLog($creditlog['Createalbum'],$windid,$winduid,'photos_Createalbum');
 	}
-	
+	*/
 	$db->update("INSERT INTO pw_cnalbum SET " . S::sqlSingle(array(
 			'aname'		=> '默认相册',
 			'aintro'	=> '默认相册',

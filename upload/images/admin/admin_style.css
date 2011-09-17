@@ -62,11 +62,12 @@ a:hover,.line{ text-decoration:underline;}
 /*bg*/
 .input_color,.input_time,.expand,.hide,.lower,.btn_add,.btn_add i,span.btn,span.bt,span.btn span,span.bt span,span.btn2,span.bt2,span.btn2 span,span.bt2 span,.td_bgB td,.del_img,.zt_stylebg,.tip_wind dt,.help_b{background:url(index_icon.png) 0 0;}
 /*form*/
-textarea,input{font:12px/12px Arial;vertical-align:middle;}
-textarea{border: 1px solid; border-color: #999999 #e1e1e1 #e1e1e1 #999999;padding:3px;}
+textarea,input,select{font-size:12px;vertical-align:middle; font-family:Arial;}
+textarea{border: 1px solid; border-color: #999999 #e1e1e1 #e1e1e1 #999999;padding:3px;background:#fff;line-height:1.5;}
+select{padding:1px;}
 .textarea{width:332px;height:62px;overflow:auto;background:#fff;line-height:1.3;}
-.input{border:1px solid; border-color: #999999 #e1e1e1 #e1e1e1 #999999;padding:2px 3px;*padding:4px 3px 0;background:#fff;}
-	.input:hover,.textarea:hover,.input_img:hover{border:1px solid #23a6dd;}
+.input{border:1px solid; border-color: #999999 #e1e1e1 #e1e1e1 #999999;padding:2px 3px;background:#fff; font-size:1em;color:#000;}
+	.textarea:hover,.input_img:focus,.input:focus{border:1px solid;border-color:#555 #aaa #aaa #555;background:#fffbde;}
 	.input_wa{width:152px;}
 	.input_wb{width:332px;}
 	.input_wc{width:67px;}

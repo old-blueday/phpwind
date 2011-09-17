@@ -46,7 +46,7 @@
 
 		isLoading = false,
 		loadingIndex = 0,
-		runVerson = '1.0',
+		runVerson = '1.0.0912',
 
 		startQueue = function () {
 		    if (loadQueue.length === 0) {

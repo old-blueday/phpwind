@@ -23,7 +23,7 @@ function updateforum($fid,$lastinfo='') {//TODO 慢查询
 		$replies  = $rs['replies'];
 		$article  = $topic + $replies + $subtopics + $subrepliess;
 		if (!$lastinfo) {
-			$lt = $db->get_one("SELECT tid,author,postdate,lastpost,lastposter,subject FROM pw_threads WHERE fid=".S::sqlEscape($fid)." AND topped=0 AND ifcheck=1 AND lastpost>0 ORDER BY lastpost DESC LIMIT 1");
+			$lt = $db->get_one("SELECT tid,author,postdate,lastpost,lastposter,subject FROM pw_threads WHERE fid=".S::sqlEscape($fid)." AND specialsort=0 AND ifcheck=1 AND lastpost>0 ORDER BY lastpost DESC LIMIT 1");
 			if ($lt['postdate'] == $lt['lastpost']) {
 				$subject = addslashes(substrs($lt['subject'],26));
 			} else {
@@ -71,7 +71,7 @@ function updateForumCount($fid, $topic, $replies, $tpost = 0) {
 	$tpost = intval($tpost);
 
 	$lastpost = '';
-	$lt = $db->get_one("SELECT tid,author,postdate,lastpost,lastposter,subject FROM pw_threads WHERE fid=" . S::sqlEscape($fid) . " AND topped='0' AND ifcheck='1' AND lastpost>0 ORDER BY lastpost DESC LIMIT 1");
+	$lt = $db->get_one("SELECT tid,author,postdate,lastpost,lastposter,subject FROM pw_threads WHERE fid=" . S::sqlEscape($fid) . " AND specialsort='0' AND ifcheck='1' AND lastpost>0 ORDER BY lastpost DESC LIMIT 1");
 	if ($lt) {
 		if ($lt['postdate'] == $lt['lastpost']) {
 			$subject = substrs($lt['subject'], 26);

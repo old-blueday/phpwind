@@ -58,7 +58,12 @@ function checkFileType() {
 function showColorPicker(inputObj,formField,reback){
 	if(!color_picker_div){
 		color_picker_div = document.createElement('DIV');
-		color_picker_div = elementBind('div','','menu','display:none;background:#fff;border:1px solid #ccc;z-index:4000;position:absolute;width:250px;padding-bottom:1px;');
+		color_picker_div = elementBind('div','','pw_menu','display:none;z-index:4000;position:absolute;width:250px;padding-bottom:3px;');
+		if(is_ie6){
+			var ie6fixed=document.createElement("iframe");
+			ie6fixed.style.cssText="z-index:-1;width:250px;height:150px;position:absolute;top:0;left:-1px;filter:Alpha(opacity=0);_filter:Alpha(opacity=0);opacity:.0;";
+			color_picker_div.appendChild(ie6fixed);
+		}
 		document.body.appendChild(color_picker_div);
 		createTopRow(color_picker_div);			
 		var contentDiv = elementBind('div','color_picker_content');

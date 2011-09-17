@@ -20,9 +20,10 @@ EOT;
 } else {
 $db_selcount = (int) $db_selcount;
 for ($i=0;$i<$db_selcount && $i <3;$i++) {
+$tabindex = 10+$i;
 print <<<EOT
 -->
-			<li><a href="javascript:;" onclick="deleteVoteOption(this);return false;" class="adel">删除</a><input name="vt_select[]" type="text" class="input input_330" /></li>
+			<li><a href="javascript:;" onclick="deleteVoteOption(this);return false;" class="adel">删除</a><input name="vt_select[]" type="text" class="input input_330" tabindex="$tabindex" /></li>
 <!--
 EOT;
 }print <<<EOT
@@ -98,6 +99,7 @@ function addVoteOption() {
 	targetInput.value = '';
 	target.style.display = '';
 	target.removeAttribute('id');
+	targetInput[0].setAttribute('tabindex',11+totalNum);
 	getObj('voteoptions').insertBefore(target, getObj('addVoteButton'));
 }
 </script>
@@ -228,6 +230,8 @@ productPicUpload.prototype={
 			}else{
 				self.iframe.contentWindow.document.documentElement.textContent="";
 			}
+			var rules = /<!\[CDATA\[([\s\S]+)\]\]>/.exec(data);
+			if (rules && rules[1]) data = rules[1];
 			var json=eval("("+data+")");
 			this.proPicReview(json.path);
 			this.setform(json.aid,json.attachurl);

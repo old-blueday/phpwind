@@ -32,7 +32,7 @@ Breeze.namespace('app.insertAttach', function (B) {
 			<div class="B_file">\
 				<div class="cc">\
 					<dl style="background:#f7f7f7;">\
-						<dt>附件名&nbsp;<span>(总共可以添加<span class="restCount s4"></span>个)</span></dt>\
+						<dt>附件名&nbsp;<span>(您还可以上传<span class="restCount s4"></span>个附件)</span></dt>\
 						<dd>附件描述</dd>\
 						<dd class="B_file_dd">操作</dd>\
 					</dl>\

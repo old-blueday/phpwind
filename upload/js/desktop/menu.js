@@ -50,12 +50,17 @@ function()
 		}
 		if(!json.items)
 		{
-			a.onclick = function()
+			a.onclick = function(evt)
 			{
+				var e=evt||window.event;
+				if(e.stopPropagation){
+					e.stopPropagation();
+				}else{
+					e.cancelBubble = true;
+				}
 				if(this.disabled) return;
 				_this.remove();
 				_this.handler(json);/*点击事件*/
-				event.cancelBubble = true;
 				return false;
 			};
 			a.className="menu_s1 fr";
@@ -243,9 +248,14 @@ function()
                 }
 				else
                 {
-                    item.onmousedown = function()
+                    item.onmousedown = function(evt)
                     {
-                        event.cancelBubble = true
+                        var e=evt||window.event;
+						if(e.stopPropagation){
+							e.stopPropagation();
+						}else{
+							e.cancelBubble = true;
+						}
                     };
                 }
             }
@@ -257,10 +267,11 @@ function()
 
 
             /*窗口点击关闭事件 firefox*/
-            ROOT[a.id] ? ROOT.detachEvent("onmousedown", ROOT[a.id]) : 0;
-            ROOT.attachEvent("onmousedown", ROOT[a.id] = function(evt)
+            ROOT[a.id] ? removeEvent(ROOT,"mousedown", ROOT[a.id]) : 0;
+            addEvent(ROOT,"mousedown",ROOT[a.id]=function(evt)
             {
-				var evt=(evt||event).srcElement;
+				var e=evt||window.event;
+				var evt=e.target||e.srcElement;
 				var el=evt.outerHTML||evt.parentNode.outerHTML;
 				navigator.userAgent.toLowerCase().indexOf("firefox")>0?el=evt.innerHTML||evt.parentNode.innerHTML:0;
                 if (b.innerHTML.toLowerCase().indexOf(el.toLowerCase())==-1)

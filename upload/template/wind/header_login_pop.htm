@@ -1,0 +1,115 @@
+<!--<?php
+print <<<EOT
+-->
+<div class="popout">
+	<table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div class="popoutContent">
+	<div style="width:330px;">
+	<div class="popTop"><a href="javascript:;" onclick="headerAjaxLogin.close();" class="adel">关闭</a>登录保护</div>
+	<form name="headrajaxlogin" action="login.php" method="post" onsubmit="return headerAjaxLogin.submitCheckInfo(document.headrajaxlogin);">
+		<input type="hidden" name="step" value="2" />
+		<input type="hidden" name="ajaxstep" value="2" />
+		<input type="hidden" name="ajax" value="1" />
+		<input type="hidden" name="jumpurl" value="$jumpurl" />
+		<input type="hidden" name="lgt" value="$lgt" />
+<!--
+EOT;
+if (isset($cktime)){print <<<EOT
+-->
+		<input type="hidden" name="cktime" value="$cktime" />
+<!--
+EOT;
+}print <<<EOT
+-->
+		<input type="hidden" name="pwuser" value="" />
+		<input type="hidden" name="pwpwd" value="" />
+	<div class="p10">
+		<div id="headrajaxlogintip" class="wrongTip" style="display:none;"></div>
+		<table width="100%">
+<!--
+EOT;
+if($db_ifsafecv && $hasSafeCv){print <<<EOT
+-->
+			<tr>
+				<td class="tar" width="75"><label for="question">安全问题：</label></td>
+				<td>
+					<p class="mb5"><select id="question" name="question" class="select_wa" onchange="showcustomquest_h(this.value)">
+						<option value="0">无安全问题</option>
+						<option value="1">我爸爸的出生地</option>
+						<option value="2">我妈妈的出生地</option>
+						<option value="3">我的小学校名</option>
+						<option value="4">我的中学校名</option>
+						<option value="5">我最喜欢的运动</option>
+						<option value="6">我最喜欢的歌曲</option>
+						<option value="7">我最喜欢的电影</option>
+						<option value="8">我最喜欢的颜色</option>
+						<option value="-1">自定义问题</option>
+					</select></p>
+					<input id="othercustomquest" style="display:none" name="customquest" class="input input_wa" size="17" />
+				</td>
+			</tr>
+			<tr>
+				<td class="tar" width="75"><label for="answer">您的答案：</label></td>
+				<td><input name="answer" id="" type="text" class="input_wa input"></td>
+			</tr>
+<script type="text/javascript">			
+function showcustomquest_h(qid){
+	getObj('othercustomquest').style.display = qid==-1 ? '' : 'none';
+}
+</script>
+<!--
+EOT;
+}if($_LoginInfo['qcheck'] && $db_question){
+if($db_imagequestion){
+	$question = "<img src='ckquestion.php?q=".$_LoginInfo['qkey']."&t=".$timestamp."' align=\"absmiddle\">";
+}else{
+	$question = $_LoginInfo['qkey']<0 ? getMachineQuestion_1() :  $db_question[$_LoginInfo['qkey']];
+}
+$q_a = $question.($_LoginInfo['showq'] && $_LoginInfo['qkey']>0?"（答案：".$db_answer[$_LoginInfo['qkey']] . '）' : '');
+print <<<EOT
+-->
+			<tr class="vt">
+				<td class="tar" width="75"><label for="qanswer">验证问题：</label></td>
+				<td>
+					<p class="mb5">{$q_a}</p><input id="qanswer" name="qanswer" type="text" class="input"><input type="hidden" name="qkey" value="{$_LoginInfo['qkey']}" />
+				</td>
+			</tr>
+<!--
+EOT;
+}if($db_gdcheck & 2){
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
+print <<<EOT
+-->
+			<tr>
+				<td class="tar vt" width="75"><label for="showheadergd">验证码：</label></td>
+				<td>
+					<input id="showheadergd" name="gdcode" type="text" style="width:50px;" class="input mr5"><span id="header_ckcode" style="display:none;"></span>$checkCodeString
+				</td>
+<script type="text/javascript">
+onReady(function(){
+		if(typeof showgd!="undefined"){
+				showgd('header_ckcode');
+		}else{
+			var arg=arguments;
+			setTimeout(function(){
+				arg.callee();	
+			},100)
+		}
+})
+
+</script>
+			</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+		</table>
+	</div>
+	<div class="popBottom"><span class="btn2"><span><button type="submit">登 录</button></span></span></div>
+	</form>
+	</div>
+</div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>
+<!--
+EOT;
+?>-->

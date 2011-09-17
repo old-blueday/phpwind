@@ -9,14 +9,14 @@ print <<<EOT
 <title>{$webPageTitle}提示信息 - Powered by phpwind</title>
 <meta http-equiv="refresh" content="{$statime};url={$URL}">
 <base id="headbase" href="$db_bbsurl/" />
-<script type="text/javascript" src="js/core/core.js"></script>
-<script type="text/javascript" src="js/pw_ajax.js"></script>
 <link rel="stylesheet" href="$imgpath/pw_core.css?{$GLOBALS['wind_repair']}" />
 EOT;
 @include Pcv($css_path);
 print <<<EOT
 -->
 <link rel="stylesheet" href="$imgpath/register/register.css?{$GLOBALS['wind_repair']}" />
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
 </head>
 <body onKeyDown="try{keyCodes(event);}catch(e){}">
 <div class="wrap">

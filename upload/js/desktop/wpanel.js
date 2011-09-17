@@ -23,9 +23,10 @@ PW.WPanel.prototype.init = function()
     var _this = this;
 
     this.ROOT.attachEvent("onmousedown",
-    function()
+    function(evt)
     {
-		var er=event.srcElement;
+		var e=evt||window.event;
+		var er=e.target||e.srcElement;
 		if(er.nodeType!=1)
 		{
 			 er=er.parentNode;

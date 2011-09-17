@@ -5,9 +5,6 @@ print <<<EOT
 <head>
 <meta charset="$db_charset" />
 <meta http-equiv="refresh" content="$statime;url=$URL">
-<script type="text/javascript" src="js/portal.js"></script>
-<script type="text/javascript" src="js/core/core.js"></script>
-<script type="text/javascript" src="mode/area/js/imagetype.js"></script>
 <link rel="stylesheet" href="images/pw_core.css?{$GLOBALS['wind_repair']}" />
 <link rel="stylesheet" href="images/pwmanage.css?{$GLOBALS['wind_repair']}" />
 <style>
@@ -18,9 +15,12 @@ body {line-height: 1.5;}
 a{color:#336699;text-decoration:none}
 a:hover{color:#ff5500;text-decoration:none}
 </style>
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/portal.js"></script>
+<script type="text/javascript" src="mode/area/js/imagetype.js"></script>
 </head>
 <div class="tipWrap">
-	<div class="regCorrect">
+	<div class="regIgnore">
 		<p class="f14 mb10 b">{$content}</p>
 		<p class="f14"><a href="$URL" class="s4 f14" tabindex="20">如果您的浏览器没有自动跳转,请点击这里</a></p>
 	</div>

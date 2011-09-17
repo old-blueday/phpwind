@@ -948,4 +948,45 @@ print <<<EOT
 		<div class="review_tips">您目前还是游客，请 <a id="fast_login" href="pw_ajax.php?action=stopiccomment&type=stopiclogin" onclick="sendmsg(this.href, 'requesturl='+requesturl);return false;" class="s4" hidefocus="true">登录</a> 或 <a href="$db_registerfile" target="_blank" class="s4" hidefocus="true">注册</a></div>
 <!--
 EOT;
+}elseif($a=='pingpage'){
+if($pid == 0) $pid = 'tpc';
+print <<<EOT
+-->
+<table width="100%">
+<tbody id="createpingbox_{$pid}"></tbody>
+<!--
+EOT;
+foreach($pingList as $value){print <<<EOT
+-->
+		<tr id="pingLogTr_{$value['id']}" onmouseover="showPingDelLink(this, true)" onmouseout="showPingDelLink(this, false)">
+			<td width="30" class="read_score_face">
+			<div id="card_pingUserShow_{$value['id']}_{$value['uid']}" class="userCard" ><a href="u.php?uid={$value['uid']}" ><img src="{$value['icon']}" width="20" height="20" /></a>
+            <span id="pingUserShow_{$value['id']}"></span>
+            </div>
+			</td>
+			<td width="45"><a target="_blank" href="u.php?uid={$value['uid']}" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[uid]}" class=" _cardshow s4 w mr10" data-card-key="{$value['pinger']}">{$value['pinger']}</a></td>
+			<td width="60"><span class="mr10 w">{$value['name']}&nbsp;<span class="s2 b">{$value['point']}</span></span></td>
+			<td>{$value['record']}</td>
+			<td class="gray read_score_time" width="100">
+<!--
+EOT;
+		if ($admincheck || ($_G['markable'] && $value['pinger'] == $windid)) {
+print <<<EOT
+-->
+      <a style="display:none;" class="s4" id="pingDel_{$value['id']}" href="javascript:void(0);" onclick="delPingLog('$fid', '$tid', '{$read['pid']}', '{$value['id']}')">删除</a>
+<!--
+EOT;
+	}
+print <<<EOT
+-->{$value['pingtime']}</td>
+			</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+            </table>
+            <div class="cc p10">$pingpages</div>
+<!--
+EOT;
 } ?>-->

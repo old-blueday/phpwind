@@ -17,12 +17,12 @@ $imageConfigTabs = "'" . implode("','", $imageConfigTabs) . "'";
 $allowAt = $_G['allowat'] ? 'true' : 'false';
 $allowAtNum = intval($_G['atnum']);
 //max attachnum
-if ($_G['allownum'] > 0 && $_G['allownum'] - $winddb['uploadnum']<$db_attachnum){
-	$maxAttachnum = $_G['allownum'] - $winddb['uploadnum'];
+$uploadedNum = $winddb['uploadtime'] < $tdtime ? 0 : $winddb['uploadnum'];
+if ($_G['allownum'] > 0 && $_G['allownum'] - $uploadedNum<$db_attachnum){
+	$maxAttachnum = $_G['allownum'] - $uploadedNum;
 } else {
 	$maxAttachnum = $db_attachnum;
 }
-
 //edit atusers
 $atusers = '';
 $tmpPid = intval($pid);
@@ -87,8 +87,10 @@ function savePostDateAndGo(url){
 }
 //清除储存的数据
 function clearPostData(){
+		if(typeof B!="undefined"&&B.util!=undefined){
 			B.util.localStorage.remove('post_title');
 			B.util.localStorage.remove('post_content');
+		}
 }
 function isEmptyObject(obj){
 	for (var name in obj) return false;

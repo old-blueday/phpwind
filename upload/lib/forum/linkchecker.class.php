@@ -15,7 +15,11 @@ class PW_LinkChecker {
 	var $caughtBlackUrls = array();
 	
 	function setConfig($whiteList, $blackList, $linkNumberLimit) {
-		$this->whiteList = is_array($whiteList) ? $whiteList : array();
+		global $db_bbsurl;
+		$ps = parse_url($db_bbsurl);
+		$ps['host'] && $this->whiteList = array($ps['host']);
+		//$this->whiteList = is_array($whiteList) ? array_merge($this->whiteList,$whiteList) : array();
+		is_array($whiteList) && $this->whiteList = array_merge($this->whiteList,$whiteList);
 		$this->blackList = is_array($blackList) ? $blackList : array();
 		$this->linkNumberLimit = $linkNumberLimit > 0 ? intval($linkNumberLimit) : 0;
 	}

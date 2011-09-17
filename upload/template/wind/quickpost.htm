@@ -1,13 +1,64 @@
 <!--<?php
 print <<<EOT
 -->
-<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="clearEditorDialog();">关闭</span>回复</div>
+<script>
+	var quickPost = function(){
+		this.titleObj = getObj('quickpostTitle');
+		this.changeTitleObj = getObj('changeTitle');
+		this.originalTitle = this.titleObj.innerHTML;
+		this.atc_title = getObj('qp_atc_title'); //表单 title
+	}
+	quickPost.prototype = {
+		"changeTitle" : function (obj){
+			obj.style.display = 'none';
+			this.originalTitle = this.titleObj.innerHTML;
+			this.titleObj.innerHTML = '<input id="newTitle" type="text" style="padding:5px;" maxlength="50" size="60" class="input mr10" value="'+ this.originalTitle +'" onblur="qp.saveTitle();"><span class="btn2"><span><button onclick="qp.saveTitle();return false;" type="button">保存</button></span></span><span class="bt2"><span><button onclick="qp.cancelSave();return false;" type="button">取消</button></span></span>';
+		},
+		"saveTitle"	: function(){
+			this.changeTitleObj.style.display = '';
+			this.atc_title.value = this.titleObj.innerHTML = getObj('newTitle').value;
+		},
+		"cancelSave" : function(){
+			this.changeTitleObj.style.display = '';
+			this.titleObj.innerHTML = this.originalTitle;
+		}
+	}
+	var qp =null;
+	window.onReady(function(){
+		qp = new quickPost();
+		getObj('quickpostArea').focus();
+<!--
+EOT;
+if($pid==0){print <<<EOT
+-->
+		qp.atc_title.value = qp.originalTitle;
+<!--
+EOT;
+}print <<<EOT
+-->
+	});
+</script>
+<div style="width:550px;">
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="clearEditorDialog(1);">关闭</span>回复</div>
 	<form name="quickpostForm" method="post" action="" enctype="multipart/form-data">
+	<input type="hidden" name="pid" value="$pid" />
 	<div id="quickpostHiddens" style="display:none"></div>
 	<div class="p10">
-		<div class="cc mb5">
-			<input type="text" maxlength="50" class="input mr10" id="atc_title" name="atc_title" value="" size="40"><span id="atc_title_warn">限100 字节</span>
+		<div class="cc mb10">
+			<input type="hidden" name="atc_title" id="qp_atc_title" value="" />
+			<span class="mr10" id="quickpostTitle">$atc_title</span><a href="javascript:void(0);" id="changeTitle" onclick="qp.changeTitle(this);" class="s4">[改标题]</a>
 		</div>
+<!--
+EOT;
+if($pid > 0){print <<<EOT
+-->
+		<div class="blockquote3 mb10" style="background-image:none;">
+			<span class="quote_left">{$old_author}: {$quote_content}</span><span class="quote_right mr10"></span><span class="gray">($postTime)</span>
+		</div>
+<!--
+EOT;
+}print <<<EOT
+-->
 		<div class="B_editor B_editor_fp cc" id="qk_editor" style="width:530px">
 			<div class="B_editor_toolbar B_editor_minitoolbar">
 				<div class="B_tar">
@@ -26,6 +77,7 @@ print <<<EOT
 				</ul>
 			</div>
 			<textarea id="quickpostArea" name="atc_content" class="editorTextarea" style="width:535px;*width:100%;max-width:100%;min-width:100%;height:140px;padding:0;margin:0;border:0 none;overflow:auto;"></textarea>
+			<textarea id="quoteContent" style="display:none" name="quote_content">$atc_content</textarea>
 		</div>
 		<div class="c mb10">&nbsp;</div>
 <!--
@@ -62,6 +114,7 @@ EOT;
 		<span class="mr20"><span style="margin:0;" class="btn"><span><button name="Submit" type="submit" title="Ctrl+Enter快速发布"> 回 复 </button></span></span></span>
 		</div>
 	</form>
+</div>
 <!--
 EOT;
 ?>-->

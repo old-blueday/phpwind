@@ -8,7 +8,7 @@ $creditdb = array(
 	'credit'	=> $winddb['credit'],
 	'currency'	=> $winddb['currency']
 );
-$creditdb += $credit->get($winduid,'CUSTOM');
+$creditdb += (array)$credit->get($winduid,'CUSTOM');
 /*SEO*/
 bbsSeoSettings();
 S::gp(array('action'));

@@ -57,6 +57,7 @@ class Pw_HookPack {
 	}
 	
 	function _getPackDirectory() {
+		pwCreateFolder(D_P . 'data/package');
 		return D_P . 'data/package/';
 	}
 	

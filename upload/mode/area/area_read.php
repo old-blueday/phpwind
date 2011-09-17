@@ -306,8 +306,8 @@ if ($foruminfo['pcid']) {
 	$N_allowpostcateopen = false;
 }
 
-$nxt_thread = $db->get_one("SELECT tid,subject FROM pw_threads WHERE fid=".S::sqlEscape($fid,false)."AND ifcheck='1' AND topped='0' AND postdate<".S::sqlEscape($thread_read['src_postdate2'],false)."ORDER BY postdate DESC LIMIT 1");
-$pre_thread = $db->get_one("SELECT tid,subject FROM pw_threads WHERE fid=".S::sqlEscape($fid,false)."AND ifcheck='1' AND topped='0' AND postdate>".S::sqlEscape($thread_read['src_postdate2'],false)."ORDER BY postdate ASC LIMIT 1");
+$nxt_thread = $db->get_one("SELECT tid,subject FROM pw_threads WHERE fid=".S::sqlEscape($fid,false)."AND ifcheck='1' AND specialsort='0' AND postdate<".S::sqlEscape($thread_read['src_postdate2'],false)."ORDER BY postdate DESC LIMIT 1");
+$pre_thread = $db->get_one("SELECT tid,subject FROM pw_threads WHERE fid=".S::sqlEscape($fid,false)."AND ifcheck='1' AND specialsort='0' AND postdate>".S::sqlEscape($thread_read['src_postdate2'],false)."ORDER BY postdate ASC LIMIT 1");
 
 
 $element_class = L::loadClass('element');

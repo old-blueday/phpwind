@@ -106,7 +106,7 @@ print <<<EOT
 -->
 			<tr class="tr1 vt">
 				<td class="td2">$datatype</td>
-				<td class="td2">$list[author]</td>
+				<td class="td2"><a target="_blank" href="u.php?username=$list[author]">$list[author]</a></td>
 				<td class="td2"><textarea rows="4" cols="40">$list[subject]</textarea></td>
 				<td class="td2"><textarea rows="4" cols="60">$list[content]</textarea></td>
 				<td class="td2">$postdate</td>
@@ -122,7 +122,6 @@ print <<<EOT
 -->
 		</table>
 	</div>
-	<div class="cc mb10">$pages</div>
 	<div class="p10 tac">
 		<span class="btn"><span><button type="submit">提 交</button></span></span>
 	</div>

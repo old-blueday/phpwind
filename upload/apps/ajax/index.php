@@ -8,7 +8,7 @@ define('AJAX','1');
 define('F_M',true);
 S::gp(array('a'));
 
-if (!in_array($a,array('showgroupwritecommlist','stopiccommentbox'))) {
+if (!in_array($a,array('showgroupwritecommlist','stopiccommentbox','pingpage'))) {
 	!$winduid && Showmsg('not_login');
 }
 
@@ -965,7 +965,35 @@ if ($a == 'delshare') {
 		echo 'have_login';
 	}
 	ajax_footer();
-}  
+} elseif ($a == 'pingpage'){
+	S::gp(array('tid','page','count','pid'));
+	$pingPerPage = 10;
+	$tid = intval($tid);
+	$page = intval($page);
+	$count = intval($count);
+	$pid = intval($pid);
+	if ($tid < 1 || $count < 1) Showmsg('undefined_action');
+	$creditnames = pwCreditNames();
+	global $db;
+	!$page && $page = 1;
+	$sqlLimit = S::sqlLimit(($page - 1)*$pingPerPage,$pingPerPage);
+	$query = $db->query("SELECT a.*,b.uid,b.icon FROM pw_pinglog a LEFT JOIN pw_members b ON a.pinger=b.username WHERE tid=".S::sqlEscape($tid). " AND a.pid = " .S::sqlEscape($pid)."  order by pingdate desc  ". $sqlLimit);
+	$pingList = array();
+	while ($rt = $db->fetch_array($query)) {
+		$rt['pid'] = $rt['pid'] ? $rt['pid'] : 'tpc';
+		list($rt['pingtime'],$rt['pingdate']) = getLastDate($rt['pingdate']);
+		$rt['record'] = $rt['record'] ? $rt['record'] : "-";
+		if ($rt['point'] > 0) $rt['point'] = "+" . $rt['point'];
+		$tmp = showfacedesign($rt['icon'],true,'s');
+		$rt['icon'] = $tmp[0];
+		isset($creditnames[$rt['name']]) && $rt['name'] = $creditnames[$rt['name']];
+		$pingList[] = $rt;
+	}
+	$pages=ceil($count/$pingPerPage);
+	$pingpages = numofpage($count,$page,$pages,"apps.php?q=ajax&a=pingpage&tid=$tid&pid=$pid&count=$count&",$pingPerPage,'ajaxPingcp');
+	require_once PrintEot('m_ajax');
+	ajax_footer();
+}
 
 function getUserNameByTypeAndId($type,$id) {
 	global $db;

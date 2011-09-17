@@ -13,7 +13,7 @@ if ($cms && $tid) {
 print <<<EOT
 -->
 <div class="tipWrap">
-	<div class="regCorrect">
+	<div class="regIgnore">
 		<p class="f14 mb10 b">$successLang</p>
 		<p class="f14 mb10">您选择了生成CMS页面，是否立即进入编辑？</p>
 		<p><span class="btn2"><span><button type="button" onclick="parent.location.href='$postModifyUrl'">编辑</button></span></span><span class="bt2"><span><button type="button" onclick="boxClose();">关闭</button></span></span></p>
@@ -25,7 +25,7 @@ EOT;
 print <<<EOT
 -->
 <div class="tipWrap">
-	<div class="regCorrect">
+	<div class="regIgnore">
 		<p class="f14 mb10 b">$successLang</p>
 		<p class="s6">两秒后自动关闭</p>
 	</div>

@@ -317,6 +317,7 @@ if ($action == 'new') {
 
 	require_once (R_P . 'require/bbscode.php');
 	$replypost->setTpc($tpcarray);
+	$content = $content."\r\n\r\n[size=2][color=#a5a5a5]内容来自[/color][color=#4f81bd][url=".$db_bbsurl."/m/index.php][手机版][/url][/color] [/size]";
 	
 	$postdata = new replyPostData($pwpost);
 	$postdata->setTitle(wap_cv($subject,false));

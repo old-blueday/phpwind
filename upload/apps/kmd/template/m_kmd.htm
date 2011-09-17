@@ -5,7 +5,7 @@ print<<<EOT
 -->
 <div class="contUser">
     <div class="p15">
-		<h4 class="site"><img src="u/images/module/jobcenter.png" align="absmiddle" class="mr10" /><span>孔明灯</span></h4>           	
+		<h4 class="site"><img src="u/images/module/lightbulb.png" align="absmiddle" class="mr10" /><span>孔明灯</span></h4>           	
         <div class="navC">
 					<a href="apps.php?q=kmd&a=help" class="fr mr10">孔明灯帮助</a>
 					<ul>
@@ -40,10 +40,10 @@ EOT;
 $unPayedNum = 0;
 foreach ($unPayedInfos as $value) {
 $unPayedNum++;
-$tmpDiscount = (0 < $value['discount'] && $value['discount'] < 10) ? "$value[discount]折" : '无折扣';
-$spreadName = $value['name'] . ' / <span class="s2">' . $value['price'] . "元 {$tmpDiscount}</span>" . ' / <span class="s2">' . $value['day'] . "天</span>";
+$tmpDiscount = (0 < $value['discount'] && $value['discount'] < 10) ? "<span class=\"s2\">$value[discount]</span>折" : '无折扣';
+$spreadName = $value['name'] . ' <span class="s2">' . $value['price'] . "</span>元" . '/<span class="s2">' . $value['day'] . "</span>天 {$tmpDiscount}";
 $appliedTime = get_date($value['createtime'], 'Y-m-d');
-$actionName = $value['type'] == KMD_PAY_TYPE_ALIPAY ? "<a href=\"{$basename}a=buy&action=pay&pid=$value[id]\" class=\"s3\">支付</a>" : '待确认';
+$actionName = $value['type'] == KMD_PAY_TYPE_ALIPAY ? "<a href=\"{$basename}a=buy&action=pay&pid=$value[id]\" class=\"s2\">支付</a>" : '待确认';
 print<<<EOT
 -->
 	<tr class="tr3">
@@ -64,10 +64,10 @@ EOT;
 EOT;
 }if (S::isArray($kmdInfos)) {print<<<EOT
 -->
-	<div style="padding:10px 20px;">
+	<div style="padding:10px">
 		<table width="100%">
-			<tr class="tr3 s5">
-				<td width="30">序号</td>
+			<tr class="tr3 bgA">
+				<td width="46" class="tac">序号</td>
 				<td>推广帖子</td>
 				<td>推广版块</td>
 				<td>推广时间</td>
@@ -78,7 +78,19 @@ EOT;
 $kmdNum = ($page - 1) * $db_perpage;
 foreach ($kmdInfos as $value) {
 $kmdNum++;
-$kmdTitle = $value['status'] == KMD_THREAD_STATUS_EMPTY ? '暂无推广帖子，请添加' : ($value['status'] == KMD_THREAD_STATUS_CHECK ? '<span class="s2">帖子审核中，请耐心等待</span>' : ($value['status'] == KMD_THREAD_STATUS_REJECT ? '<span class="s1">帖子未通过审核，请重新添加</span>' : "<a href=\"read.php?tid=$value[tid]\" target=\"_blank\">" . substrs($value['subject'], 60) . '</a>'));
+switch($value['status']){
+	case KMD_THREAD_STATUS_CHECK:
+		$kmdTitle = "<a href=\"read.php?tid=$value[tid]\" target=\"_blank\">" . substrs($value['subject'], 60) . '</a>' . ' <span class="s2">(审核中)</span>';
+		break;
+	case KMD_THREAD_STATUS_REJECT:
+		$kmdTitle = '<span class="s1">帖子未通过审核，请重新添加</span>';
+		break;
+	case KMD_THREAD_STATUS_OK:
+		$kmdTitle = "<a href=\"read.php?tid=$value[tid]\" target=\"_blank\">" . substrs($value['subject'], 60) . '</a>';
+		break;
+	default:
+		$kmdTitle = '暂无推广帖子，请添加';
+}
 $leftTime = $value['endtime'] - $timestamp;
 $leftDay = floor($leftTime / 86400);
 $leftHour = floor(($leftTime - $leftDay * 86400) / 3600);
@@ -94,6 +106,10 @@ print<<<EOT
 			<a href="{$basename}a=buy&action=renew&kid=$value[kid]" class="mr10">续费</a>
 <!--
 EOT;
+	if ($leftTime > 0){print <<<EOT
+-->
+<!--
+EOT;
 if (S::inArray($value['status'], array(KMD_THREAD_STATUS_EMPTY, KMD_THREAD_STATUS_REJECT))) {
 print<<<EOT
 -->
@@ -106,7 +122,9 @@ print<<<EOT
 	<a href="javascript:;" onclick="addThread('$value[kid]', 'changethread');">换个帖子</a>
 <!--
 EOT;
-}print<<<EOT
+}
+}
+print<<<EOT
 -->
 		</td>
 	</tr>
@@ -139,6 +157,7 @@ EOT;
 		<td width="13">&nbsp;</td>
 		<td width="24">序号</td>
 		<td>推广版块</td>
+		<td width="160">支付状态</td>
 		<td width="160">推广费用</td>
 		<td width="160">购买时间</td>
 	</tr>
@@ -155,6 +174,7 @@ print<<<EOT
 		<td width="13">&nbsp;</td>
 		<td class="tac">$recordsCount</td>
 		<td><a href="thread.php?fid=$value[fid]" target="_blank">$value[forumname]</a></td>
+		<td width="160">{$kmdService->payStatus[$value['status']]}</td>
 		<td width="160"><span class="s2">$value[money] 元</span></td>
 		<td width="160">$buyTime</td>
 	</tr>
@@ -203,6 +223,14 @@ EOT;
 $spreadsOptions = '';
 $firstOption = 0;
 foreach ($spreads as $value) {
+	if(preg_match('/^(\d+)\.00$/',$value['price'],$m)){
+		$value['price'] = $m[1];
+	} else if (preg_match('/^(\d+\.\d)0$/',$value['price'],$m)){
+		$value['price'] = $m[1];
+	}
+	if (preg_match('/(\d)\.0$/',$value['discount'],$m)){
+		$value['discount'] = $m[1];
+	}
 	$defaultOption = ++$firstOption == 1 ? 'checked' : '';
 	$discount = (0< $value['discount'] && $value['discount'] < 10) ? "<span class=\"s2\">$value[discount]</span>折" : '&nbsp;';
 	$spreadsOptions .= "<p class=\"mb10\"><label class=\"mr20 w\"><input name=\"spread\" type=\"radio\" style=\"margin:-3px 4px 0 0;\" value=\"$value[sid]\" $defaultOption />$value[name] <span class=\"s2\">$value[price]</span>元/<span class=\"s2\">$value[day]</span>天 {$discount}</label></p>";
@@ -216,22 +244,22 @@ foreach ($spreads as $value) {
 		<div style="padding:20px 5px 10px;" class="bdA"><span class="b s4 mr10 f14">联系资料</span></div>
 		  <table width="100%">
 			<tr class="tr3">
-				<td width="80">真实姓名：</td>
-				<td width="200"><input name="realname" id="realname" type="text" value="$userBuyInfo[realname]" class="input mr5 input_wa"/><span class="s1">*</span></td>
+				<td width="80">真实姓名<span class="s1">*</span></td>
+				<td width="200"><input name="realname" id="realname" type="text" value="$userBuyInfo[realname]" class="input mr5 input_wa"/></td>
 				<td><span class="gray">用于孔明灯审核联系使用，请务必填写正确</span></td>
 			</tr>
 			<tr class="tr3">
-				<td>手机号码：</td>
-				<td><input name="phone" id="phone" type="text" value="$userBuyInfo[phone]" class="input mr5 input_wa"/><span class="s1">*</span></td>
+				<td>手机号码<span class="s1">*</span></td>
+				<td><input name="phone" id="phone" type="text" value="$userBuyInfo[phone]" class="input mr5 input_wa"/></td>
 				<td><span class="gray">用于孔明灯审核联系使用，请务必填写正确</span></td>
 			</tr>
 			<tr class="tr3">
-				<td>发票抬头：</td>
+				<td>发票抬头</td>
 				<td><input name="invoice" type="text" value="$userBuyInfo[invoice]" class="input mr5 input_wa"/></td>
 				<td><span class="gray">公司填写企业名称，个人填写姓名</span></td>
 			</tr>
 			<tr class="tr3">
-				<td>联系地址：</td>
+				<td>联系地址</td>
 				<td><input name="address" type="text" value="$userBuyInfo[address]" class="input mr5 input_wa"/></td>
 				<td><span class="gray">填写正确的联系地址，用于发票寄送</span></td>
 			</tr>
@@ -257,10 +285,10 @@ if ($ol_onlinepay && $ol_payto) {
 print<<<EOT
 -->
 			<div class="bdB mb15" style="padding:0 5px;">
-				<p class="mb5"><em style="display:inline-block;width:25px;"><input name="paytype" type="radio" value="1" $alipayChecked /></em><span class="f14 b s5">支付宝（推荐）</span></p>
+				<p class="mb5"><em style="display:inline-block;width:25px;"><input name="paytype" type="radio" id="paytype1" value="1" $alipayChecked /></em><span class="f14 b s5"><label for="paytype1">支付宝（推荐）</label></span></p>
 				<p class="gray mb10"><em style="display:inline-block;width:25px;">&nbsp;</em>支付宝支付方式，可供个人支付宝及企业支付宝支付。</p>
 				<div class="bgA boxA s5" style="padding:10px 0;margin-bottom:20px;">
-					<p class="mb5"><em style="display:inline-block;width:25px;">&nbsp;</em>支付宝账户：$ol_payto </p>
+					<p class="mb5" style="padding-left:25px;">支付宝账户：$ol_payto </p>
 				</div>
 			</div>
 <!--
@@ -268,12 +296,12 @@ EOT;
 }if ($db_kmd_account && $db_kmd_bank) {print<<<EOT
 -->
 			<div class="bdB mb15">
-				<p class="mb5"><em style="display:inline-block;width:25px;"><input name="paytype" type="radio" value="2" $bankChecked /></em><span class="f14 b s5">银行转帐</span></p>
+				<p class="mb5"><em style="display:inline-block;width:25px;"><input name="paytype" type="radio" id="paytype2" value="2" $bankChecked /></em><span class="f14 b s5"><label for="paytype2">银行转帐</label></span></p>
 				<p class="gray mb10"><em style="display:inline-block;width:25px;">&nbsp;</em>企业单位支付方式，仅限企业间的转账支付。</p>
 				<div class="bgA boxA s5" style="padding:10px 0;margin-bottom:20px;">
-					<p class="mb5"><em style="display:inline-block;width:25px;">&nbsp;</em>公司名称：$db_kmd_company</p>
-					<p class="mb5"><em style="display:inline-block;width:25px;">&nbsp;</em>账　　户：$db_kmd_account</p>
-					<p><em style="display:inline-block;width:25px;">&nbsp;</em>开 户 行：$db_kmd_bank</p>
+					<p class="mb5" style="padding-left:25px;">开&nbsp;户&nbsp;行：$db_kmd_bank</p>
+					<p class="mb5" style="padding-left:25px;">公司名称：$db_kmd_company</p>
+					<p style="padding-left:25px;">银行账户：$db_kmd_account</p>
 				</div>
 			</div>
 <!--
@@ -281,10 +309,10 @@ EOT;
 }if ($db_kmd_address) {print<<<EOT
 -->
 			<div class="bdB mb15">
-				<p class="mb5"><em style="display:inline-block;width:25px;"><input name="paytype" type="radio" value="3" $cashChecked /></em><span class="f14 b s5">现金</span></p>
+				<p class="mb5"><em style="display:inline-block;width:25px;"><input name="paytype" type="radio" id="paytype3" value="3" $cashChecked /></em><span class="f14 b s5"><label for="paytype3">现金</label></span></p>
 				<p class="gray mb10"><em style="display:inline-block;width:25px;">&nbsp;</em>在以上2种方式都不能实现的情况下，携带现金到现场办理手续。</p>
 				<div class="bgA boxA s5" style="padding:10px 0;margin-bottom:20px;">
-					<p><em style="display:inline-block;width:25px;">&nbsp;</em>办理地址：$db_kmd_address</p>
+					<p style="padding-left:25px;">办理地址：$db_kmd_address</p>
 				</div>
 			</div>
 <!--
@@ -376,6 +404,7 @@ var kmd = {
 		}
 		var forum = getObj('fid');
 		var fname = fidvalidate.value;
+		if (!fname || fname == 1) fname = this.getSelectedFname(forum);
 		getObj('foruminfo').innerHTML = '<a href="thread.php' + '?fid=' + forum.value + '" target="_blank">' + fname + '</a>';
 		var spread = _this.getSpread();
 		var spreadInfo;
@@ -387,7 +416,7 @@ var kmd = {
 		if (spreadInfo) {
 			var discount = (0 < spreadInfo.discount && spreadInfo.discount < 10) ? spreadInfo.discount + '折' : '无折扣';
 			var money = (0 < spreadInfo.discount && spreadInfo.discount < 10) ? (spreadInfo.price * spreadInfo.discount / 10) : spreadInfo.price;
-			money = money.toFixed(2);
+			money = Number(money).toFixed(2);
 			getObj('fee').innerHTML = '原价 ' + spreadInfo.price + '元，<span class="s2">' + discount + '</span>，应付 <span class="s2">' + money + '元</span>';
 		}
 		_this.init('pay');
@@ -398,6 +427,17 @@ var kmd = {
 		for (var i = 0, len = spread.length; i < len; i++) {
 			if (spread[i].checked) return spread[i].value;
 		}
+	},
+	'getSelectedFname' : function(obj){
+		for(var i=0; i<obj.length; i++){
+			if (obj.value == obj[i].value){
+				var fname = obj[i].text;
+				fname = fname.replace('|-','');
+				fname = fname.replace(/^\s+/ig,'');
+				return fname;
+			}
+		}
+		return '';
 	}
 };
 setTimeout(function(){

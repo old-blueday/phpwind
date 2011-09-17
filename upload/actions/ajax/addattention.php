@@ -30,7 +30,6 @@ if ($recommend) {
 	$userCache = L::loadClass('UserCache', 'user');
 	$userCache->delete($winduid, 'recommendUsers');
 }
-
 echo "success\t";
 ajax_footer();
 

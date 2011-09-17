@@ -181,7 +181,7 @@ if (empty($job)) {
 			$id = $activePost->insertData();
 			//activitynum加一
 			//* $db->update("UPDATE pw_colonys SET activitynum=activitynum+'1' WHERE id=" . S::sqlEscape($cyid));
-			$db->update(pwQuery::buildClause("UPDATE :pw_table SET activitynum=activitynum+'1' WHERE id=:id", array('pw_colonys', $cyid)));
+			$db->update(pwQuery::buildClause("UPDATE :pw_table SET activitynum=activitynum+'1' WHERE id=:id", array('pw_colonys', intval($cyid))));
 			$colony['activitynum']++;
 			updateGroupLevel($colony['id'], $colony);
 			refreshto("{$basename}&job=view&id=$id",'活动发布成功!');

@@ -32,7 +32,7 @@ select{vertical-align:middle;border:1px solid #b4cceb;height:22px;font-size:12px
 .customquest{ background-position:0 -150px;}
 .admin_btn{margin-top:1em;width:80px;height:30px;}
 </style>
-<script src="js/desktop/core.js"></script>
+<script type="text/javascript" src="js/core/core.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -99,26 +99,7 @@ EOT;
 <div class="bottom">phpwind <span style="color:#ff6600">v$wind_version</span></div>
 <script type="text/javascript">
 document.login.admin_name.focus();
-var agt = navigator.userAgent.toLowerCase();
-var is_ie = ((agt.indexOf("msie") != -1) && (agt.indexOf("opera") == -1));
-function getObj(id){
-	return document.getElementById(id);
-}
-function showcustomquest(qid){
-	getObj("customquest").style.display = qid==-1 ? '' : 'none';
-}
-function ietruebody(){
-	return (document.compatMode && document.compatMode!="BackCompat")? document.documentElement : document.body;
-}
-function getTop() {
-	return typeof window.pageYOffset != 'undefined' ? window.pageYOffset:ietruebody().scrollTop;
-}
-function getLeft() {
-	return (typeof window.pageXOffset != 'undefined' ? window.pageXOffset:ietruebody().scrollLeft)
-}
 </script>
-<script src="js/core/core.js"></script>
-<script src="js/global.js"></script>
 </body></html>
 <!--
 EOT;

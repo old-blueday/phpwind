@@ -474,8 +474,9 @@ function searchBlur(e){
 	}
 	//e.parentNode.className = 'ip';
 }
-function getSearchType(event){
-	var n = event.srcElement || event.target;
+function getSearchType(evt){
+	var e=evt||window.event;
+	var n = e.srcElement || e.target;
 	if(n && n.tagName!='LI') return;
 	n.parentNode.parentNode.getElementsByTagName('h6')[0].innerHTML = n.innerHTML;
 	var lis = n.parentNode.getElementsByTagName('li');
@@ -537,7 +538,7 @@ function searchInput() {
             type:       'warning',
             message:    '',// 弹出提示的文字
             showObj:    null,// 要显示的本地元素,在ajax提示是常用
-            width:      350,// 弹出框高度
+            width:      300,// 弹出框高度
             isMask:     1,
             autoHide:   0,// 是否自动关闭
 		    zIndex:		9999, // 层叠值
@@ -577,7 +578,7 @@ function searchInput() {
             var self = this,
                 opt = self.options,
                 box = opt.showObj;
-            	closep();
+            	//closep();
                 createButton = function(){// 创建按钮
                     var html = [],btn = opt.button;
                     if(opt.autoHide){ html.push('<div class="fl gray">本窗口<span class="spanTime">'+ opt.autoHide +'</span>秒后关闭</div>');}
@@ -925,7 +926,8 @@ function searchInput() {
 			if(typeof pw_baseurl!="undefined"){
 				url=pw_baseurl+"/";
 			}
-			ajax.send(url+'pw_ajax.php?action=clearmessage','',function(){
+			var num=this.closeBtn.getAttribute("data-num");
+			ajax.send(url+'pw_ajax.php?action=clearmessage&num='+num,'',function(){
 				var rText = ajax.request.responseText.split('\t');
 					self.ele.style.display="none";
 			});
@@ -1169,7 +1171,7 @@ function searchInput() {
 				var mine=json.mine||"";
 				var medals=json.medals||[];
 				var displayLen=this.wrapWidth/this.liWidth;//可显示的图标个数
-				var gender = genderClass == 2 ? 'women' : 'man';
+				var gender = genderClass == 1 ? 'man' : 'women';
 				var isonline = json.online == 1 ? '_ol' : '_unol';
 				var genderclass = gender+isonline;
 				//判断它正在看
@@ -1228,6 +1230,7 @@ function searchInput() {
 					'+(medalsLen>0?medalHtml:'')+'</div>';
 				fragment.appendChild(card);
 				//return fragment;
+				this.popContent.innerHTML="";//fix ajax multi addEvent  
 				this.popContent.appendChild(fragment);
 				this.medalList=getObj("cardMedal");
 				this.prev=getObj("card_pre");

@@ -464,7 +464,7 @@ if (!$action) {
 			$rt = $db->get_one('SELECT topic AS sum FROM pw_forumdata WHERE fid='.S::sqlEscape($fid));
 		}
 		$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage), "forumcp.php?action=edit&type=thread&fid=$fid&$url_a");
-		$query = $db->query("SELECT tid,subject,author,authorid,postdate,titlefont,topped,digest,specialsort FROM pw_threads WHERE fid=".S::sqlEscape($fid)." AND ifcheck='1' $sql ORDER BY topped DESC,lastpost DESC $limit");
+		$query = $db->query("SELECT tid,subject,author,authorid,postdate,titlefont,topped,digest,specialsort FROM pw_threads WHERE fid=".S::sqlEscape($fid)." AND ifcheck='1' $sql ORDER BY specialsort DESC,lastpost DESC $limit");
 		$threaddb = $toppedThread = array();
 		while ($rt = $db->fetch_array($query)) {
 			$rt['subject'] = substrs($rt['subject'],35);
@@ -533,7 +533,7 @@ if (!$action) {
 			$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage), "forumcp.php?action=edit&type=tcheck&fid=$fid&$url_a");
 
 			$threaddb = $ttable_a = $attachs = array();
-			$query = $db->query("SELECT tid,subject,author,authorid,postdate FROM pw_threads WHERE fid=".S::sqlEscape($fid)." AND ifcheck='0' $sql ORDER BY topped DESC,lastpost DESC $limit");
+			$query = $db->query("SELECT tid,subject,author,authorid,postdate FROM pw_threads WHERE fid=".S::sqlEscape($fid)." AND ifcheck='0' $sql ORDER BY specialsort DESC,lastpost DESC $limit");
 			while ($rt = $db->fetch_array($query)) {
 				$rt['subject']	= substrs($rt['subject'],35);
 				$rt['postdate']	= get_date($rt['postdate']);

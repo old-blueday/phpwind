@@ -15,7 +15,7 @@ $loginTypeName = array(1 => array('用户名', 0), 2 => array('UID', 1), 4 => ar
 print <<<EOT
 -->	
 	{$loginTypeName[$db_logintype][0]}
-	<input type="hidden" name="lgt" value="{$loginTypeName[$db_logintype][1]}" />
+	<input type="hidden" name="lgt" id="lgt" value="{$loginTypeName[$db_logintype][1]}" />
 <!--
 EOT;
 } elseif ($db_logintype > 0 && $db_logintype < 8) {
@@ -46,17 +46,17 @@ EOT;
 EOT;
 } else {print <<<EOT
 -->
-			用户名
+			<label for="poppwuser">用户名</label>
 <!--
 EOT;
 }print <<<EOT
 -->
 		</td>
-		<td><input name="pwuser" type="text" class="input input_wa" id="poppwuser"/></td>
+		<td><input name="pwuser" type="text" class="input input_wa" id="poppwuser" /></td>
 	</tr>
 	<tr>
-		<td>密　码</td>
-		<td><input name="pwpwd" type="password" class="input input_wa" /></td>
+		<td><label for="pwpwd">密　码</label></td>
+		<td><input name="pwpwd" type="password" id="pwpwd" class="input input_wa" /></td>
 	</tr>
 <!--
 EOT;
@@ -70,8 +70,8 @@ print <<<EOT
 		</select>&nbsp;<input id="customquest" style="display:none" type="text" name="customquest" class="input" /></td>
 	</tr>
 	<tr>
-		<td>您的答案</td>
-		<td><input type="text" name="answer" class="input" /></td>
+		<td><label for="answer">您的答案</label></td>
+		<td><input type="text" name="answer" id="answer" class="input" /></td>
 	</tr>
 <!--
 EOT;
@@ -92,8 +92,8 @@ $q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey] . '）' : 
 print <<<EOT
 -->
 			<tr class="vt">
-				<td>验证问答</td>
-				<td><p class="mb5">{$q_a}</p><input class="input input_wa" type="text" name="qanswer" /><input type="hidden" name="qkey" value="$qkey" /> </td>
+				<td><label for="qanswer">验证问答</label></td>
+				<td><p class="mb5">{$q_a}</p><input class="input input_wa" id="qanswer" type="text" name="qanswer" /><input type="hidden" name="qkey" value="$qkey" /> </td>
 			</tr>
 <!--
 EOT;
@@ -109,8 +109,8 @@ $time = time();
 print <<<EOT
 -->
 	<tr class="vt">
-		<td>验证码</td>
-		<td><input class="input" type="text" name="gdcode" size="5" onfocus="showgd();" />
+		<td><label for="gdcode">验证码</label></td>
+		<td><input class="input" type="text" id="gdcode" name="gdcode" size="5" onfocus="showgd();" />
 		<span style="cursor:pointer; margin-left:3px" onclick="showgd();" id="showtips">&nbsp;点此显示验证码</span>
 		<div id="ckcode" style="display:none;"></div>
 $checkCodeString
@@ -137,7 +137,6 @@ $loginWays = $weiboLoginService->getLoginWays();
 if ($loginWays) {
 print <<<EOT
 -->
-
 	<link rel="stylesheet" href="u/images/expand/weibologin.css" />
 	<div class="p20">
 		<h4>使用合作网站帐号登录：</h4>

@@ -8,7 +8,6 @@ L::loadClass('forum', 'forum', false);
 L::loadClass('post', 'forum', false);
 //* include_once pwCache::getPath(D_P.'data/bbscache/cache_post.php');
 pwCache::getData(D_P.'data/bbscache/cache_post.php');
-
 /**
 * 版块缓冲文件
 */

@@ -101,5 +101,6 @@ $lang['refreshto'] = array(
 	'act_alipay_sign_failure'	=> '数字签名认证失败',
 	'act_undefined_operate'		=> '非法操作',
 	'mode_o_photos_private_3'   => '该相册已加密，请输入正确密码.',
+	'operate_success_reload'	=> '操作成功!',
 );
 ?>

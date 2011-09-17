@@ -53,7 +53,7 @@ if ($db_htmifopen) {
 }
 
 foreach ($_POST as $_key => $_value) {
-	if (!in_array($_key,array('atc_content','atc_title','prosign','pwuser','pwpwd'))) {
+	if (!in_array($_key,array('atc_content','atc_title','quote_content','prosign','pwuser','pwpwd'))) {
 		S::checkVar($_POST[$_key]);
 	}
 }
@@ -74,9 +74,8 @@ if (false !== ($dirstrpos = strpos($pwServer['SCRIPT_NAME'],$db_dir))) {
 $REQUEST_URI = $pwServer['PHP_SELF'].($pwServer['QUERY_STRING'] ? '?'.$pwServer['QUERY_STRING'] : '');
 
 $_mainUrl = $index_url = $db_bbsurl;
-$bbsurlArray = parse_url($db_bbsurl);
-$R_url = $db_bbsurl = S::escapeChar(str_replace($bbsurlArray['host'],$pwServer['HTTP_HOST'],$db_bbsurl));
-defined('SIMPLE') && SIMPLE && $db_bbsurl = substr($db_bbsurl,0,-7);
+$R_url = $db_bbsurl = parseBbsUrl();
+
 $defaultMode = empty($db_mode) ? 'bbs' : $db_mode;
 $db_mode = 'bbs';
 
@@ -195,7 +194,7 @@ if (is_numeric($winduid) && strlen($windpwd)>=16) {
 			unset($creditdb['0']);
 			foreach ($creditdb as $val) {
 				list($credit_1, $credit_2) = explode(':', $val);
-				$tmpCreditPop .= '<span class="st2">'.pwCreditNames($credit_1).'&nbsp;<span class="f24">'.$credit_2.'</span></span>';
+				$tmpCreditPop .= '<span class="w"><em class="mr5 b">'.pwCreditNames($credit_1).'</em><span class="f20">'.$credit_2.'</span></span>';
 			}
 		}
 		$credit_pop = $tmpCreditPop;
@@ -277,8 +276,11 @@ visitRightByGroup();
 if ($_G['pwdlimitime'] && !defined('PRO') && !S::inArray($windid,$manager) && $timestamp-86400*$_G['pwdlimitime']>$winddb['pwdctime'] ) {
 	Showmsg('pwdchange_prompt');
 }
+
+require_once(R_P.'lib/cloudwind/cloudwind.class.php');
 $cloud_information = CloudWind::getUserInfo();
 CloudWind::sendUserInfo($cloud_information);
+
 //响应
 
 /**
@@ -1246,6 +1248,20 @@ function parseRewriteQueryString($queryString){
 	}
 	return $_NGET;
 }
+
+/**
+ * 解析替换$db_bbsurl 多站点二级域名,有端口情况
+ */
+function parseBbsUrl() {
+	global $db_bbsurl,$pwServer;
+	$bbsurlArray = parse_url($db_bbsurl);
+	$parsePort = '';
+	if (strrpos($db_bbsurl, ':') !== false && strrpos($pwServer['HTTP_HOST'], ':') !== false) {
+		$parsePort = ':'.$bbsurlArray['port'];
+	}
+	return S::escapeChar(str_replace($bbsurlArray['host'].$parsePort,$pwServer['HTTP_HOST'],$db_bbsurl));
+}
+
 class bbsTemplate {
 
 	var $dir;

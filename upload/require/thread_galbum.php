@@ -160,7 +160,7 @@ if (empty($a)) {
 				'memopen'   => 1
 			)));
 			//* $db->update("UPDATE pw_colonys SET albumnum=albumnum+1 WHERE id=" . S::sqlEscape($cyid));
-			$db->update(pwQuery::buildClause("UPDATE :pw_table SET albumnum=albumnum+1 WHERE id=:id", array('pw_colonys', $cyid)));
+			$db->update(pwQuery::buildClause("UPDATE :pw_table SET albumnum=albumnum+1 WHERE id=:id", array('pw_colonys', intval($cyid))));
 		}
 		$query = $db->query("SELECT aid,aname,memopen FROM pw_cnalbum WHERE atype='1' AND ownerid=" . S::sqlEscape($cyid) . ' ORDER BY aid DESC');
 		while ($rt = $db->fetch_array($query)) {
@@ -228,7 +228,7 @@ if (empty($a)) {
 		$colony = getGroupByCyid($cyid);
 
 		//* $db->update("UPDATE pw_colonys SET photonum=photonum+" . S::sqlEscape($photoNum) . " WHERE id=" . S::sqlEscape($cyid));
-		$db->update(pwQuery::buildClause("UPDATE :pw_table SET photonum=photonum+:photonum WHERE id=:id", array('pw_colonys',$photoNum,$cyid)));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET photonum=photonum+:photonum WHERE id=:id", array('pw_colonys',$photoNum,intval($cyid))));
 
 		$colony['photonum']+=$photoNum;
 		updateGroupLevel($colony['id'], $colony);

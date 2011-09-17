@@ -68,7 +68,11 @@ class PW_MembersDB extends BaseDB {
 		foreach ($increments as $field => $offset) {
 			$offset = intval($offset);
 			if (!$offset) continue;
-			$incrementStatement[] = $field . "=" . $field . "+" . $offset;
+			if ($offset<0){
+				$incrementStatement[] = $field . "=" . $field   . $offset;
+			}else{
+				$incrementStatement[] = $field . "=" . $field . "+" . $offset;
+			}
 		}
 		if (empty($incrementStatement)) return 0;
 		
@@ -188,7 +192,7 @@ class PW_MembersDB extends BaseDB {
 		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " WHERE groupid <> 6 ".$sqlWhere." ORDER BY uid DESC LIMIT " . $limit);
 		return $this->_getAllResultFromQuery($query);
 	}
-	
+
 	/**
 	 * 注意只提供搜索服务
 	 * @version phpwind 8.0

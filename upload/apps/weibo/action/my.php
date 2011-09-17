@@ -213,7 +213,16 @@ if ($do == 'post') {
 	}
 
 } elseif ($do == 'lookround') {
-
+	/* platform weibo app */
+	$isSiteBindWeibo = false;
+	$siteBindService = L::loadClass('WeiboSiteBindService', 'sns/weibotoplatform/service'); /* @var $siteBindService PW_WeiboSiteBindService */
+	if ($siteBindService->isOpen()) {
+		$isSiteBindWeibo = true;
+		$userBindService = L::loadClass('WeiboUserBindService', 'sns/weibotoplatform/service'); /* @var $userBindService PW_WeiboUserBindService */
+		$userBindList = $userBindService->getBindList($winduid);
+		$isUserBindOne = $userBindService->isBindOne($winduid);
+	}
+	
 	$count = $weiboService->getWeibosCount();
 	$pageCount = ceil($count / $perpage);
 	$page = validatePage($page,$pageCount);

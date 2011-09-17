@@ -100,7 +100,13 @@ var MC = {
 		setCurrent(src,dst,css);
 	},
 	/* send post reply */
-	sendPostReply : function(url,form,otherid){		
+	sendPostReply : function(url,form,otherid){
+		var e=getEvent();
+		if(e.preventDefault){
+			e.preventDefault();
+		}else{
+			e.returnValue=false;
+		}
 		var replyContent = editor.getHTML();
 		var mid = MC.$("parentMid").value;
 		if("" == mid){

@@ -31,6 +31,8 @@ if ( $action == 'setucenter' ) {
 		$reward['credit']['min'] = intval($reward['credit']['min']);
 		$reward['credit']['max'] = intval($reward['credit']['max']);
 		$reward['credit']['step'] = intval($reward['credit']['step']);
+		$config['cachetimemin']	=intval($config['cachetimemin']);
+		$config['cachetimemax']	=intval($config['cachetimemax']);
 		if ($config['punchopen'] && ($reward['credit']['min'] < 1 || $reward['credit']['max'] < 1)) {
 			adminmsg('打卡奖励设置有误!');
 		}
@@ -58,6 +60,11 @@ if ( $action == 'setucenter' ) {
 		//url静态 设置到全局
 		setConfig('db_userurlopen', $configa['userurlopen'], null, false);
 		updatecache_c();
+		updatecache_openforum();
+		if ($config['browseopen']!='0'){
+			updateLastPostUser();
+			updateFansSort();
+		}
 		setoParams( $config );
 		adminmsg('operate_success');
 	}
@@ -100,5 +107,45 @@ function setoParams( $config ){
 		$updatecache = true;
 	}
 	$updatecache && updatecache_conf('o',true);
+}
+function updateLastPostUser(){
+	global $db,$timestamp;
+	L::loadClass('getinfo', '', false);
+	$getinfo =& GetInfo::getInstance();
+	$userId=$userIds=array();
+	$db->update("DELETE FROM pw_elements WHERE type='lastpostuser' ");
+	$userIds = $getinfo->getLastPostUser(100);
+	if (!S::isArray($userIds))return false;
+	foreach ($userIds as $key => $value) {
+		$userId[$key]['id'] = $value;
+		$userId[$key]['value'] =$timestamp;
+		$userId[$key]['type'] ="lastpostuser";
+		$userId[$key]['mark'] ="tid";
+	}
+	if ($userId) {
+		$sql = "REPLACE INTO pw_elements(id,value,type,mark) VALUES ".S::sqlMulti($userId,true);
+		$db->update($sql);
+	}
+	return true;
+}
+function updateFansSort(){
+	global $db;
+	L::loadClass('getinfo', '', false);
+	$getinfo =& GetInfo::getInstance();
+	$userId=$userIds=array();
+	$db->update("DELETE FROM pw_elements WHERE type='totalfans' ");
+	$userIds = $getinfo->getTotalFansSort(100);
+	if (!S::isArray($userIds))return false;
+	foreach ($userIds as $key => $value) {
+		$userId[$key]['id'] = $value['uid'];
+		$userId[$key]['value'] =$value['fans'];
+		$userId[$key]['type'] ="totalfans";
+		$userId[$key]['mark'] ="fans";
+	}
+	if ($userId) {
+		$sql = "REPLACE INTO pw_elements(id,value,type,mark) VALUES ".S::sqlMulti($userId,true);
+		$db->update($sql);
+	}
+	return true;
 }
 ?>

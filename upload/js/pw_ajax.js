@@ -267,8 +267,13 @@ XMLhttp.prototype = {
 }
 
 var ajax = new XMLhttp();
-
 function sendmsg(url,data,id,callback) {//callback 07-05扩展,用来执行html生成之后的回调,不影响之前代码
+	var e=getEvent();
+	if(e.preventDefault){
+		e.preventDefault();
+	}else{
+		e.returnValue=false;
+	}
 	read.obj = (!!id&&typeof id === 'string') ? getObj(id) :(typeof id=="object")?id:null;
 	read.guide();
 	setTimeout(function(){ajax.send(url,data,function(){

@@ -32,3 +32,6 @@ Disallow: /pw_ajax.php
 Disallow: /pw_api.php
 Disallow: /pw_app.php
 Disallow: /survey.php
+Disallow: /login.php
+Disallow: /register.php
+Disallow: /sendpwd.php
